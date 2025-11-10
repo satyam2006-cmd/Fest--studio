@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FestStudios</title>
+
+    <!-- jQuery and Tailwind -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              offcream: "#f7f6ed",
+              forest: "#184d27",
+              soft: "#E9E3D7",
+            },
+            fontFamily: {
+              display: ['"DM Serif Display"', "serif"],
+              sans: ["Inter", "system-ui", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      body {
+        margin: 0;
+        font-family: "Poppins", sans-serif;
+        background-color: #f7f6ed; /*offcream
+        /* background-image: url(mandal.jpg);
+        background-size:fill */
+        color: #184d27; /* forest green */
+      }
+
+      /* HERO IMAGE */
+      .hero-img-wrapper {
+        display: inline-block;
+        padding: 16px;
+        border: 1px solid #184d27;
+        border-top-left-radius: 55%;
+        border-top-right-radius: 55%;
+        overflow: hidden;
+      }
+      .hero-img-wrapper img {
+        width: 100%;
+        height: auto;
+        max-width: 460px;
+        max-height: 500px;
+        object-fit: cover;
+        border-top-left-radius: 55%;
+        border-top-right-radius: 55%;
+      }
+
+      /* CAROUSEL */
+      #carousel {
+        position: relative;
+        height: 400px;
+        margin: 0 auto;
+        overflow: hidden;
+        max-width: 90%;
+      }
+      #carousel div {
+        position: absolute;
+        transition: transform 1s, left 1s, opacity 1s, z-index 0s;
+        opacity: 1;
+        cursor: pointer;
+      }
+      #carousel div img {
+        width: 100%;
+        max-width: 400px;
+        transition: width 1s;
+        border-radius: 12px;
+        border: 2px solid #184d27;
+      }
+      #carousel .hideLeft {
+        left: 0%;
+        opacity: 0;
+        transform: translateY(50%) translateX(-50%);
+      }
+      #carousel .hideLeft img {
+        width: 200px;
+      }
+      #carousel .hideRight {
+        left: 100%;
+        opacity: 0;
+        transform: translateY(50%) translateX(-50%);
+      }
+      #carousel .hideRight img {
+        width: 200px;
+      }
+      #carousel .prev {
+        z-index: 5;
+        left: 30%;
+        transform: translateY(50px) translateX(-50%);
+      }
+      #carousel .prev img {
+        width: 300px;
+      }
+      #carousel .prevLeftSecond {
+        z-index: 4;
+        left: 15%;
+        transform: translateY(50%) translateX(-50%);
+        opacity: 0.7;
+      }
+      #carousel .prevLeftSecond img {
+        width: 200px;
+      }
+      #carousel .selected {
+        z-index: 10;
+        left: 50%;
+        transform: translateY(0px) translateX(-50%);
+      }
+      #carousel .next {
+        z-index: 5;
+        left: 70%;
+        transform: translateY(50px) translateX(-50%);
+      }
+      #carousel .next img {
+        width: 300px;
+      }
+      #carousel .nextRightSecond {
+        z-index: 4;
+        left: 85%;
+        transform: translateY(50%) translateX(-50%);
+        opacity: 0.7;
+      }
+      #carousel .nextRightSecond img {
+        width: 200px;
+      }
+
+      /* TESTIMONIALS */
+      .card h3 {
+        color: #184d27;
+      }
+      .testimonials {
+        max-width: 1200px;
+        margin: 40px auto;
+        border: 1px solid #184d27;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        overflow: hidden;
+        background: #f7f6ed;
+      }
+      .card {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        padding: 30px 20px;
+        justify-content: space-between;
+        color: #184d27;
+      }
+      .card:not(:last-child) {
+        border-right: 1px solid #184d27;
+      }
+      .card img {
+        width: 220px;
+        height: 240px;
+        border-radius: 50%;
+        border-bottom-left-radius: 0px;
+        object-fit: cover;
+        margin: 0 auto 20px;
+        border: 2px solid #184d27;
+      }
+      .divider {
+        width: 60px;
+        height: 2px;
+        background: #184d27;
+        margin: 0 auto 20px;
+      }
+      @media (max-width: 900px) {
+        .testimonials {
+          grid-template-columns: 1fr;
+        }
+        .card:not(:last-child) {
+          border-right: none;
+          border-bottom: 1px solid #ccc;
+        }
+      }
+
+      /* FAQ */
+      .scallop-mask {
+        -webkit-mask: radial-gradient(20px, #000 98%, transparent) left 20px top
+            calc(20px * 1) / 40px 40px repeat-y,
+          radial-gradient(20px, #000 98%, transparent) right 20px top
+            calc(20px * 1) / 40px 40px repeat-y,
+          linear-gradient(#000 0 0);
+        mask: radial-gradient(20px, #000 98%, transparent) left 20px top
+            calc(20px * 1) / 40px 40px repeat-y,
+          radial-gradient(20px, #000 98%, transparent) right 20px top
+            calc(20px * 1) / 40px 40px repeat-y,
+          linear-gradient(#000 0 0);
+      }
+      .hairline {
+        height: 1px;
+        background: linear-gradient(
+          to right,
+          transparent,
+          rgba(24, 77, 39, 0.15),
+          transparent
+        );
+      }
+      .last {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        height: 80vh;
+        background: #f7f6ed;
+      }
+      .last-content {
+        position: relative;
+        display: inline-block;
+      }
+      .last h1 {
+        font-size: clamp(7rem, 21vw, 21rem);
+        margin: 0;
+        line-height: 1.05;
+        font-weight: 200;
+        color: #184d27;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- NAVBAR -->
+    <header
+      class="flex justify-between items-center px-6 py-4 border-b border-[forest] bg-offcream sticky top-0 z-50"
+      style="background-color: #f7f6ed; border-color: #184d27"
+    >
+      <div
+        class="logo font-bold text-lg flex items-center gap-2"
+        style="color: #184d27"
+      >
+      <a href="{{ url_for('chat.chat_index') }}">🎉 FestStudios</a>
+      </div>
+      <nav class="hidden md:flex gap-6 font-medium" style="color: #184d27">
+      <a href="{{ url_for('home') }}">Home</a>
+        <a href="#featured-events" class="scroll-to-events">Events</a>
+      <a href="{{ url_for('ourteam') }}">Blog</a>
+        <a href="{{ url_for('chat.chat_index') }}">Community</a>
+      {% if session.get('user') %}
+      <div class="relative">
+          <button id="hostings-btn" class="hover:underline">My Hosting</button>
+          <div id="hostings-dropdown" class="hidden absolute left-1/2 -translate-x-1/2 mt-2 w-80 bg-white rounded-lg shadow-xl z-20 border border-gray-200">
+              <div class="p-4">
+                  <h3 class="text-lg font-semibold text-forest mb-2">My Hosted Events</h3>
+                  <div class="max-h-64 overflow-y-auto">
+                      {% if user_hosted_events %}
+                          <ul class="divide-y divide-gray-100">
+                          {% for event in user_hosted_events %} {# Add a unique ID to each list item #}
+                              <li id="hosted-event-{{ event.id }}" class="py-2 flex justify-between items-center">
+                                  <div>
+                                      <a href="{{ url_for('event_detail', event_id=event.id) }}" class="text-sm font-medium text-gray-900 hover:underline">{{ event.event_name }}</a>
+                                      <p class="text-xs text-gray-500">{{ event.event_datetime | format_event_time(session.get('user', {}).get('timezone', 'UTC')) }}</p>
+                                  </div>
+                                  <div class="flex items-center gap-2">
+                                      <form action="{{ url_for('chat.delete_hosted_event', event_id=event.id) }}" method="POST" class="delete-event-form inline">
+                                          {{ form.hidden_tag() }}
+                                          <button type="submit" class="text-xs text-red-500 hover:text-red-700">Delete</button>
+                                      </form>
+                                  </div>
+                              </li>
+                          {% endfor %}
+                          </ul>
+                      {% else %}
+                          <p class="text-sm text-gray-500">You have not hosted events.</p>
+                      {% endif %}
+                  </div>
+                  <a href="{{ url_for('host_event') }}" class="block w-full text-center mt-3 px-4 py-2 bg-forest text-white text-sm font-medium rounded-md hover:bg-opacity-90">Host New Event</a>
+              </div>
+          </div>
+      </div>
+      {% endif %}
+      </nav>
+      <div class="login font-medium hidden md:block" style="color: #184d27">
+        {% if session.get('user') %}
+        <div class="flex items-center gap-4">
+          <a href="{{ url_for('chat.profile') }}" class="hover:underline">Welcome, {{ session['user'].get('username') or session['user'].get('email')}}</a>
+          <a href="{{ url_for('logout') }}" class="text-sm px-3 py-1 rounded-full bg-forest text-offcream hover:bg-opacity-90">Logout</a>
+        </div>
+        {% else %}
+        <a href="{{ url_for('signin') }}">Login</a>
+        {% endif %}
+      </div>
+      <!-- Mobile Menu Button -->
+      <button
+        id="menuBtn"
+        class="md:hidden px-3 py-2 border rounded"
+        style="border-color: #184d27; color: #184d27"
+      >
+        ☰
+      </button>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div
+      id="mobileMenu"
+      class="hidden md:hidden flex-col bg-offcream border-b border-[forest]"
+      style="background-color: #f7f6ed; border-color: #184d27"
+    >
+      <a href="{{ url_for('home') }}" class="p-3 border-t border-forest/20" style="color: #184d27">Home</a>
+      <a href="#featured-events" class="scroll-to-events p-3 border-t border-forest/20" style="color: #184d27">Events</a>
+      <a href="{{ url_for('ourteam') }}" class="p-3 border-t border-forest/20" style="color: #184d27">Blog</a>
+      <a href="{{ url_for('chat.chat_index') }}" class="p-3 border-t border-forest/20" style="color: #184d27">Community</a>
+      {% if session.get('user') %}
+        <!-- Mobile My Hostings Dropdown -->
+        <div class="border-t border-forest/20">
+          <button id="mobile-hostings-btn" class="w-full text-left p-3 flex justify-between items-center" style="color: #184d27">
+            <span>My Hostings</span>
+            <span>▼</span>
+          </button>
+          <div id="mobile-hostings-dropdown" class="hidden bg-white/50 pl-4">
+            <div class="py-2 pr-2">
+              <div class="max-h-48 overflow-y-auto text-sm">
+                {% if user_hosted_events %}
+                  <ul class="divide-y divide-gray-200">
+                    {% for event in user_hosted_events %}
+                    <li class="py-2 flex justify-between items-center">
+                      <a href="{{ url_for('event_detail', event_id=event.id) }}" class="text-gray-800 hover:underline">{{ event.event_name }}</a>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  <p class="text-gray-500">No hosted events.</p>
+                {% endif %}
+              </div>
+              <a href="{{ url_for('host_event') }}" class="block text-center mt-3 px-3 py-1.5 bg-forest text-white text-xs font-medium rounded-md hover:bg-opacity-90">Host New Event</a>
+            </div>
+          </div>
+        </div>
+        <a href="{{ url_for('chat.profile') }}" class="p-3 border-t border-forest/20" style="color: #184d27">Profile</a>
+        <a href="{{ url_for('logout') }}" class="p-3 border-t border-forest/20" style="color: #184d27">Logout</a>
+      {% else %}
+        <a href="{{ url_for('signin') }}" class="p-3 border-t border-forest/20" style="color: #184d27">Login</a>
+      {% endif %}
+    </div>
+
+    <section class="hero">
+      <div class="hero-text">
+        <p class="tagline" style="color: #184d27">
+          CREATE EPIC MOMENTS WITH US
+        </p>
+        <h1 style="color: #c7b843">FestStudios</h1>
+        <h2 style="color: #184d27">Event Planner</h2>
+        <p>
+          We organize college fests, cultural nights, and corporate events with
+          perfection. Our mission is to make your event unforgettable by
+          handling everything from planning to execution seamlessly.
+        </p>
+        <!-- Book Now button -->
+        <button id="bookNowBtn">HOST NOW!</button>
+      </div>
+
+      <div class="hero-img-wrapper">
+        <img
+          src="https://www.globallogic.com/wp-content/uploads/2025/01/Meet-Our-Leaders-hero.jpg"
+          alt="Fest celebration"
+        />
+      </div>
+    </section>
+    <div
+      class="motto-section"
+      style="background-color: #f7f6ed; border-color: #184d27"
+    >
+      <h1
+        class="main-heading"
+        style="color: #184d27; text-align: left; padding-left: 1.5%"
+      >
+      Our Motto ~
+      </h1>
+      <center>
+        <h2 class="sub-heading sub-1" style="color: #cba834">
+          Work responsibly
+        </h2>
+        <h2 class="sub-heading sub-2"><del>Work under pressure</del></h2>
+        <h2 class="sub-heading sub-3"><del>Work without purpose</del></h2>
+        <h2 class="sub-heading sub-4"><del>Work full weekends</del></h2>
+      </center>
+    </div>
+
+    <style>
+      .hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 60px;
+        gap: 40px;
+        background: #f7f6ed;
+      }
+
+      .hero-text {
+        max-width: 50%;
+        color: #184d27;
+      }
+
+      .hero-text h1 {
+        font-size: 48px;
+        margin: 10px 0;
+        color: #184d27;
+      }
+
+      .hero-text h2 {
+        font-size: 24px;
+        font-weight: 600;
+        color: #184d27;
+        margin-bottom: 20px;
+      }
+
+      .hero-text p {
+        margin: 20px 0;
+        color: #184d27;
+        line-height: 1.6;
+      }
+
+      .hero-text button {
+        padding: 12px 24px;
+        border: 2px solid #184d27;
+        background: none;
+        font-size: 16px;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: #184d27;
+      }
+
+      #premiumBookBtn {
+        text-decoration: none;
+      }
+
+      .hero-text button:hover {
+        background: #184d27;
+        color: #e6e3c7;
+      }
+
+      /* Image frame */
+      .hero-img-wrapper {
+        display: inline-block;
+        padding: 16px;
+        border: 1px solid #184d27;
+        border-top-left-radius: 55%;
+        border-top-right-radius: 55%;
+        overflow: hidden;
+      }
+
+      .hero-img-wrapper img {
+        width: 460px;
+        height: 500px;
+        object-fit: cover;
+        display: block;
+        border-top-left-radius: 55%;
+        border-top-right-radius: 55%;
+      }
+
+      /* 📱 Mobile Responsiveness */
+      @media (max-width: 768px) {
+        .hero {
+          flex-direction: column;
+          padding: 40px 20px;
+          text-align: center;
+        }
+
+        .hero-text {
+          max-width: 100%;
+        }
+
+        .hero-img-wrapper {
+          margin-top: 30px;
+          border-radius: 20px; /* softer on mobile */
+          width: 100%;
+          padding: 10px;
+        }
+
+        .hero-img-wrapper img {
+          width: 100%;
+          height: auto;
+          border-radius: 20px;
+        }
+      }
+      .motto-section {
+        padding: 50px;
+        background-color: #f7f6ed;
+        text-align: center;
+      }
+
+      .main-heading {
+        font-size: 3rem;
+        font-weight: 600;
+        color: #184d27;
+        margin-bottom: 20px;
+        opacity: 0;
+        animation: fadeIn 1.5s forwards;
+        animation-delay: 0.5s;
+      }
+
+      .sub-heading {
+        font-size: 2rem;
+        font-weight: 500;
+        color: #184d27;
+        margin: 10px 0;
+        opacity: 0;
+        align-content: center;
+        animation: fadeIn 1s forwards;
+      }
+
+      .sub-1 {
+        animation-delay: 1s;
+        font-weight: bold;
+        color: #184d27;
+      }
+      .sub-2 {
+        animation-delay: 1.5s;
+      }
+      .sub-3 {
+        animation-delay: 2s;
+      }
+      .sub-4 {
+        animation-delay: 2.5s;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .cta-btn {
+        position: absolute;
+        top: 60%;
+        left: 52%;
+        transform: translate(-50%, -50%);
+        padding: 14px 32px;
+        border: 2px solid #184d27;
+        border-radius: 550px;
+        background: #f7f6ed;
+        color: #184d27;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .cta-btn:hover {
+        background: #184d27;
+        color: #f7f6ed;
+        text-transform: var("studiosfest@gmail.com");
+      }
+    </style>
+
+    <!-- FEATURED EVENTS -->
+    <main id="featured-events">
+      <h1 class="text-align left text-[3rem] font-bold" style="color: #184d27; padding-left: 5%">
+        Featured Events :
+      </h1>
+      <div id="carousel" style="text-align:center; min-height: 400px; position: relative;"> {# Carousel container #}
+        <!-- This container will be populated by the buildCarousel() JavaScript function. -->
+        <!-- The Jinja2 loop was removed to prevent conflicts with the client-side script. -->
+        <!-- The script below will handle showing the 'No upcoming events' message if needed. -->
+      </div>
+      
+      <!-- Navigation Arrows -->
+      <div class="flex justify-center items-center gap-8 mt-6">
+        <button id="prevBtn" class="w-12 h-12 rounded-full bg-[#184d27] text-white flex items-center justify-center hover:bg-[#0f361a] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#184d27] focus:ring-opacity-50">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button id="nextBtn" class="w-12 h-12 rounded-full bg-[#184d27] text-white flex items-center justify-center hover:bg-[#0f361a] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#184d27] focus:ring-opacity-50">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+    </main>
+
+    <!-- TESTIMONIALS -->
+    <h1 class="text-center text-[3rem] mb-6" style="color: #184d27">
+      <br />
+      What Our Clients Say :
+    </h1>
+    <section class="testimonials">
+      <div class="card">
+        <img
+          src="https://randomuser.me/api/portraits/women/68.jpg"
+          alt="Client photo"
+          alt="Leah Yurfer"
+        />
+        <div class="divider"></div>
+        <p class="text-sm text-gray-700">
+          "FestStudios transformed our annual college fest into an unforgettable experience!
+          Their attention to detail and seamless execution made everything stress-free. Highly recommend!"
+        </p>
+        <h3><br />Leah Yurfer</h3>
+      </div>
+      <div class="card">
+        <img
+          src="https://randomuser.me/api/portraits/men/32.jpg"
+          alt="Client photo"
+          alt= "Roy Gold"
+        />
+        <div class="divider"></div>
+        <p class="text-sm text-gray-700">
+          "Working with FestStudios for our corporate event was a game-changer.
+          Their innovative ideas and professional approach ensured a successful and engaging day for all our attendees."
+        </p>
+        <h3><br />Roy Gold</h3>
+      </div>
+      <div class="card">
+        <img
+          src="https://randomuser.me/api/portraits/women/45.jpg"
+          alt="Client photo"
+          alt= "Nela Yiluay"
+        />
+        <div class="divider"></div>
+        <p class="text-sm text-gray-700">
+          "From concept to clean-up, FestStudios handled every aspect of our cultural night with flair.
+          Their team is incredibly talented and dedicated. We're already planning our next event with them!"
+        </p>
+        <h3><br />Nela Yiluay</h3>
+      </div>
+    </section>
+
+    <!-- FAQ SECTION -->
+    <main class="mx-auto max-w-6xl px-4 pt-6 pb-6" style="background: #f7f6ed">
+      <p></p>
+      <section class="grid grid-cols-1 md:grid-cols-12 gap-10 items-start">
+        <div class="md:col-span-4">
+          <span class="text-sm uppercase tracking-wide" style="color: #184d27"
+            >FAQ</span
+          >
+          <h1
+            class="font-display leading-tight text-5xl md:text-6xl mt-4"
+            style="color: #184d27"
+          >
+            You’re<br />probably<br />wondering…
+          </h1>
+        </div>
+        <div class="md:col-span-5">
+          <h2 class="text-xl font-semibold" style="color: #184d27">
+            Frequently asked questions
+          </h2>
+          <div id="panel-general" class="mt-4 space-y-2">
+            <div class="hairline"></div>
+            <details class="group">
+              <summary
+                class="flex justify-between py-3 cursor-pointer"
+                style="color: #184d27"
+              >
+                <span class="font-medium">What is an FAQ section?</span>
+                <span>+</span>
+              </summary>
+              <p class="pb-4 text-sm opacity-80" style="color: #184d27">
+                An FAQ section helps visitors quickly find answers to common
+                questions.
+              </p>
+            </details>
+            <div class="hairline"></div>
+            <details class="group">
+              <summary
+                class="flex justify-between py-3 cursor-pointer"
+                style="color: #184d27"
+              >
+                <span class="font-medium">Why do FAQs matter?</span>
+                <span>+</span>
+              </summary>
+              <p class="pb-4 text-sm opacity-80" style="color: #184d27">
+                They reduce support load and improve user trust and clarity.
+              </p>
+            </details>
+            <div class="hairline"></div>
+            <details class="group">
+              <summary
+                class="flex justify-between py-3 cursor-pointer"
+                style="color: #184d27"
+              >
+                <span class="font-medium">Where can I add my FAQs?</span>
+                <span>+</span>
+              </summary>
+              <p class="pb-4 text-sm opacity-80" style="color: #184d27">
+                Add them to a dedicated FAQ page or directly under relevant
+                sections.
+              </p>
+            </details>
+            <div class="hairline"></div>
+          </div>
+        </div>
+        <aside class="md:col-span-3">
+          <div class="overflow-hidden rounded-[28px] scallop-mask">
+            <img
+              src="{{ url_for('static', filename='image.png') }}"
+              alt="Decor"
+              class="w-full h-[360px] object-cover"
+            />
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <section id="last" class="last">
+      <div class="last-content">
+        <h1 style="color: #184d27">Let’s Talk</h1>
+        <button class="cta-btn">KNOW MORE</button>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer
+      class="flex flex-col md:flex-row justify-between items-center px-6 py-4 border-t text-sm"
+      style="background: #f7f6ed; color: #184d27; border-color: #184d27"
+    >
+      <div>@feststudios | studiosfest@gmail.com</div>
+      <div class="mt-2 md:mt-0 flex gap-4">
+        <a href="#" style="color: #184d27">Privacy Policy</a>
+        <a href="#" style="color: #184d27">Terms</a>
+      </div>
+    </footer>
+
+    <script>
+    function buildCarousel(events) {
+        const container = $("#carousel");
+        container.empty(); // Clear previous items
+
+        if (events.length === 0) {
+            container.html(`
+                <p style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                    No upcoming events! <a href="/host-event" style="color: #184d27; text-decoration: underline;">Host one now</a> 🎉
+                </p>
+            `);
+            return;
+        }
+
+        events.forEach((event, i) => {
+            if (event.event_logo) {
+                const eventDiv = $("<div></div>");
+                const eventLink = $("<a></a>").attr("href", `/events/${event.id}`);
+                const eventImg = $("<img>")
+                    .attr("src", event.event_logo)
+                    .attr("data-event-id", event.id)
+                    .attr("alt", event.event_name)
+                    .attr("loading", "lazy");
+                const eventTitle = $("<h3></h3>").css({ "margin-top": "10px", color: "#184d27" }).text(event.event_name);
+
+                eventLink.append(eventImg, eventTitle);
+                eventDiv.append(eventLink);
+
+                if (i === 0) { eventDiv.addClass("selected"); }
+                else if (i === 1) { eventDiv.addClass("next"); }
+                else if (i === 2) { eventDiv.addClass("nextRightSecond"); }
+                else { eventDiv.addClass("hideRight"); }
+
+                container.append(eventDiv);
+            }
+        });
+    }
+
+    // Run the initialization function when the document is ready
+    $(document).ready(function() {
+        // The backend now provides a perfectly filtered list of upcoming events.
+        // We can pass it directly to the buildCarousel function without any client-side filtering.
+        const allEventsData = {{ carousel_events|tojson|safe }};
+        buildCarousel(allEventsData);
+    });
+
+  // Carousel navigation
+  function moveToSelected(element) {
+    let selected;
+    if (element === "next") selected = $(".selected").next();
+    else if (element === "prev") selected = $(".selected").prev();
+    else selected = element;
+
+    const next = $(selected).next();
+    const prev = $(selected).prev();
+    const prevSecond = $(prev).prev();
+    const nextSecond = $(next).next();
+
+    $(selected).removeClass().addClass("selected");
+    $(prev).removeClass().addClass("prev");
+    $(next).removeClass().addClass("next");
+    $(nextSecond).removeClass().addClass("nextRightSecond");
+    $(prevSecond).removeClass().addClass("prevLeftSecond");
+    $(nextSecond).nextAll().removeClass().addClass("hideRight");
+    $(prevSecond).prevAll().removeClass().addClass("hideLeft");
+  }
+
+  // Keyboard navigation
+  $(document).keydown(function (e) {
+    if (e.which === 37) moveToSelected("prev");
+    if (e.which === 39) moveToSelected("next");
+  });
+  
+  // Button navigation
+  $('#prevBtn').on('click', function() {
+    moveToSelected('prev');
+  });
+  
+  $('#nextBtn').on('click', function() {
+    moveToSelected('next');
+  });
+
+  // Smooth scrolling for navigation
+  $('a.scroll-to-events').on('click', function(e) {
+    e.preventDefault();
+    $('html, body').animate({
+      scrollTop: $('#featured-events').offset().top - 50
+    }, 800);
+  });
+  $("#carousel div").click(function () {
+    moveToSelected($(this));
+  });
+</script>
+    <script> {# Mobile menu and "Book Now" button actions #}
+      // Mobile menu toggle
+      $("#menuBtn").click(function () {
+        $("#mobileMenu").toggleClass("hidden");
+      });
+
+      // Mobile hostings dropdown toggle
+      $("#mobile-hostings-btn").click(function () {
+        $("#mobile-hostings-dropdown").slideToggle("fast");
+      });
+
+      // Book Now button action
+      $("#bookNowBtn").click(function () {
+        // Use a data attribute or set a JS variable from Jinja for login state
+        var isLoggedIn = "{{ 'true' if session.get('user') else 'false' }}";
+        if (isLoggedIn === 'true') {
+          window.location.href = "/host-event"; // Redirect to host event page if signed in
+        } else {
+          window.location.href = "/signin"; // Redirect to sign in if not signed in
+        }
+      });
+    </script>
+
+    <script> {# Tooltip and dropdown toggle #}
+      $(".cta-btn").on("mouseenter", function () {
+        $(this).text("studiosfest@gmail.com");
+      });
+      $(".cta-btn").on("mouseleave", function () {
+        $(this).text("KNOW MORE");
+      });
+
+      // My Hostings Dropdown Toggle
+      $('#hostings-btn').on('click', function (event) {
+        event.stopPropagation();
+        $('#hostings-dropdown').toggleClass('hidden');
+      });
+
+      // Close dropdown if clicking outside
+      $(document).on('click', function(event) {
+        if (!$(event.target).closest('#hostings-btn, #hostings-dropdown').length) {
+          $('#hostings-dropdown').addClass('hidden');
+        }
+      });
+
+      // Auto-dismiss flash messages
+      $(document).ready(function () {
+        // Auto-dismiss flash messages 
+        // Find any flash message containers. This is a common pattern.
+        // If your container has a different class or ID, you can change '.flash-messages'
+        const flashMessages = $(".flash-messages, .flashes"); // Targeting common names
+        if (flashMessages.length > 0) {
+            setTimeout(function() {
+                flashMessages.fadeOut('slow', function() { $(this).remove(); });
+            }, 2000); // 2000 milliseconds = 2 seconds
+        }
+      });
+
+      // Enhanced frontend deletion for hosted events
+      $(".delete-event-form").on("submit", function (e) {
+        e.preventDefault(); // Stop the form from submitting immediately
+        const form = this;
+        const eventId = $(form).attr("action").split("/").pop();
+
+        if (confirm("Are you sure you want to permanently delete this event?")) {
+          // 1. Find and hide the item in the "My Hostings" dropdown
+          const eventListItem = $(`#hosted-event-${eventId}`);
+          eventListItem.fadeOut("fast", function () {
+            $(this).remove();
+          });
+
+          // 2. Find and remove the item from the main carousel
+          const carouselItem = $(`#carousel img[data-event-id='${eventId}']`).closest("div");
+          if (carouselItem.length > 0) {
+            carouselItem.remove();
+          }
+
+          // 3. Now submit the form to the backend to perform the actual deletion
+          form.submit();
+        }
+      });
+    </script>
+  </body>
+</html>

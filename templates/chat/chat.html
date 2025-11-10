@@ -1,0 +1,596 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-5xl mx-auto p-2 sm:p-4">
+    <div class="bg-white rounded-xl border flex flex-col md:flex-row h-[80vh] min-h-[70vh]">
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header -->
+            <div class="border-b p-3 sm:p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                <div>
+                    <h2 class="text-xl font-bold break-words">{{ community.name }}</h2>
+                    {% if community.description %}
+                        <p class="text-sm text-gray-600 mt-1 break-words">{{ community.description }}</p>
+                    {% endif %}
+                </div>
+                <a href="{{ url_for('chat.communities') }}" class="text-sm text-blue-600 hover:underline whitespace-nowrap">← Back to Communities</a>
+            </div>
+            <!-- Messages -->
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-2 sm:p-6 space-y-4 bg-slate-50">
+                {% for msg in messages %}
+                {% set is_self = msg.user_id == user.id %}
+                {% if msg.type == 'poll' %}
+                <div class="flex {% if is_self %}justify-end{% else %}justify-start{% endif %}">
+                  <div id="poll-{{ msg.poll_id }}" class="max-w-full sm:max-w-[70%] p-4 my-2 rounded-2xl shadow-sm {% if is_self %}bg-slate-900 text-white rounded-br-md{% else %}bg-white border rounded-bl-md{% endif %}">
+                    <div class="flex items-center gap-2 mb-2">
+                      <span class="text-xs font-semibold {% if is_self %}text-blue-300{% else %}text-blue-600{% endif %}">Poll by {{ msg.username }}</span>
+                      <span class="text-xs text-gray-400 ml-auto">{{ msg.ts|default(msg.created_at) }}</span>
+                    </div>
+                     <div class="font-bold text-lg mb-3">{{ msg.question }}</div>
+                    <div class="space-y-2">
+                      {% for opt in msg.options %}
+                      <div class="poll-option group flex items-center gap-2 cursor-pointer transition-all border rounded-lg px-3 py-2 {% if is_self %}border-slate-600 hover:bg-slate-700{% else %}border-slate-200 hover:bg-slate-50{% endif %}
+                          {% if opt.selected %}ring-2 ring-blue-500 bg-blue-100{% endif %}"
+                           data-poll-id="{{ msg.poll_id }}" data-option-id="{{ opt.id }}">
+                        <div class="flex-1">
+                          <span class="font-medium">{{ opt.text }}</span>
+                          <div class="w-full h-2 {% if is_self %}bg-slate-700{% else %}bg-slate-100{% endif %} rounded mt-1">
+                            <div class="h-2 rounded bg-blue-500 transition-all" style="width: {{ opt.percent or 0 }}%"></div>
+                          </div>
+                        </div>
+                        <span class="ml-2 text-xs {% if is_self %}text-slate-300{% else %}text-gray-500{% endif %} group-hover:text-blue-600 font-semibold">{{ opt.votes or 0 }} votes</span>
+                      </div>
+                      {% endfor %}
+                    </div>
+                    {% if msg.user_id == user.id %}
+                    <div class="text-right mt-3">
+                      <button class="delete-poll-btn text-xs text-red-400 hover:underline" data-poll-id="{{ msg.poll_id }}">Delete Poll</button>
+                    </div>
+                    {% endif %}
+                  </div>
+                </div>
+                {% else %}
+                <div id="message-{{ msg.id }}" class="message-wrapper flex {% if is_self %}justify-end{% else %}justify-start{% endif %} group">
+                    <div class="relative {% if is_self %}bg-slate-900 text-white{% else %}bg-slate-100 text-gray-900{% endif %} max-w-full sm:max-w-[70%] px-4 sm:px-5 py-3 rounded-2xl shadow-sm
+                        {% if is_self %}rounded-br-md{% else %}rounded-bl-md{% endif %}">
+                        <!-- Reply Context -->
+                        {% if msg.reply_to_id and msg.replied_to_username %}
+                        <div class="reply-context border-l-2 {% if is_self %}border-blue-300{% else %}border-blue-500{% endif %} pl-2 mb-2 text-xs opacity-80">
+                            <div class="font-semibold">Replying to {{ msg.replied_to_username }}</div>
+                            <div class="truncate">{{ msg.replied_to_text }}</div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="text-xs font-semibold mb-1 {% if is_self %}text-blue-200{% else %}text-blue-700{% endif %}">
+                            {{ msg.username }}
+                        </div>
+                        <div class="text-base break-words" data-message-content="{{ msg.id }}">{{ msg.text }}</div>
+                        <!-- Message Actions -->
+                         <div class="absolute top-0 right-0 -mt-2 mr-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                            <button class="reply-btn p-1 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/40" title="Reply" data-message-id="{{ msg.id }}" data-username="{{ msg.username }}" data-text="{{ msg.text }}">↩️</button>
+                            {% if is_self %}
+                            <button class="edit-msg-btn p-1 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/40" title="Edit" data-message-id="{{ msg.id }}">✏️</button>
+                            <button class="delete-msg-btn p-1 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/40" title="Delete" data-message-id="{{ msg.id }}">🗑️</button>
+                            {% endif %}
+                        </div>
+                        <div class="text-[11px] mt-1 text-right {% if is_self %}text-blue-200{% else %}text-gray-400{% endif %}">
+                            {% if msg.is_edited %}<span class="italic">edited</span>{% endif %}
+                            {{ msg.created_at.split('T')[1][:5] if msg.created_at else '' }}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            <!-- Typing Indicator -->
+            <div id="typing-indicator" class="h-6 px-4 sm:px-6 text-sm text-gray-500 italic"></div>
+            <!-- Reply Indicator -->            
+            <div id="reply-indicator" class="hidden items-center gap-2 px-4 py-2 border-t bg-slate-100 text-sm">
+                <div class="flex-1">
+                    Replying to <strong id="reply-username"></strong>: <em id="reply-text" class="truncate"></em>
+                </div>
+                <button id="cancel-reply-btn" class="text-red-500 hover:text-red-700">&times;</button>
+            </div>
+            <!-- Message Input -->
+            <div class="border-t p-2 sm:p-4 bg-white">
+                <div class="flex items-center gap-2">
+                    <button id="create-poll-btn" title="Create a poll" class="p-2 rounded-full hover:bg-slate-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                    </button>
+                    <form id="message-form" class="flex-1 flex gap-2">
+                        <input type="text" 
+                            name="message"
+                            id="message-input" 
+                            placeholder="Write a message" 
+                            class="flex-1 border border-slate-200 rounded-full px-3 sm:px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50"
+                            autocomplete="off">
+                        <button type="submit" 
+                            class="bg-slate-900 text-white px-4 sm:px-6 py-2 rounded-full hover:bg-slate-800 transition-colors font-semibold">
+                            Send
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </main>
+        <!-- Active Members Sidebar (optional, can be removed if not needed) -->
+        <aside class="w-full md:w-1/4 border-l p-2 sm:p-4 bg-blue-50">
+            <h3 class="font-semibold mb-4 text-gray-800">Active Members</h3>
+            <ul id="members-list" class="space-y-2">
+                {% for member in members %}
+                <li class="flex items-center gap-2 text-sm text-black">
+                    <span class="member-status w-3 h-3 rounded-full bg-gray-300" data-username="{{ member.username }}"></span>
+                    <span class="truncate">{{ member.username }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </aside>
+    </div>
+</div>
+
+<!-- Edit Message Modal -->
+<div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+        <h3 class="text-lg font-bold mb-4">Edit Message</h3>
+        <form id="edit-form">
+            <input type="hidden" id="edit-message-id">
+            <textarea id="edit-message-input" class="w-full border rounded-md p-2" rows="4" required></textarea>
+            <div class="flex justify-end gap-2 mt-4">
+                <button type="button" id="cancel-edit-btn" class="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-slate-900 text-white rounded-md hover:bg-slate-800">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+<!-- Poll Creation Modal -->
+<div id="poll-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md border border-slate-200 relative">
+        <button id="cancel-poll-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">&times;</button>
+        <h3 class="text-xl font-bold mb-4 text-slate-800">Create a New Poll</h3>
+        <form id="poll-form">
+            <div class="mb-4">
+                <label for="poll-question" class="block text-sm font-medium text-gray-700">Question</label>
+                <input type="text" id="poll-question" name="question" required class="mt-1 block w-full border border-slate-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-3 py-2">
+            </div>
+            <div id="poll-options-container" class="space-y-2 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Option 1</label>
+                    <input type="text" name="options[]" required class="mt-1 block w-full border border-slate-300 rounded-lg shadow-sm px-3 py-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Option 2</label>
+                    <input type="text" name="options[]" required class="mt-1 block w-full border border-slate-300 rounded-lg shadow-sm px-3 py-2">
+                </div>
+            </div>
+            <button type="button" id="add-option-btn" class="text-sm text-blue-600 hover:underline mb-4">+ Add another option</button>
+            <div class="flex justify-end gap-2 mt-4">
+                <button type="button" id="cancel-poll-btn-footer" class="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-slate-900 text-white rounded-md hover:bg-slate-800">Create Poll</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+<script>
+    const socket = io();
+    const communityId = {{ community.id|tojson }};
+    const userId = '{{ user.id }}';
+    const username = '{{ user.username or user.email }}';
+
+    // Join community room
+    socket.emit('join', { 
+        community_id: communityId,
+        user_id: userId,
+        username: username
+    });
+
+    // Handle message submission
+    const form = document.getElementById('message-form');
+    const input = document.getElementById('message-input');
+    const messagesContainer = document.getElementById('chat-messages');
+
+    let typingTimer;
+    const typingInterval = 1500; // 1.5 seconds
+
+    input.addEventListener('input', () => {
+        clearTimeout(typingTimer);
+        socket.emit('typing', {
+            community_id: communityId,
+            username: username
+        });
+
+        typingTimer = setTimeout(() => {
+            socket.emit('stop_typing', {
+                community_id: communityId,
+                username: username
+            });
+        }, typingInterval);
+    });
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const replyIndicator = document.getElementById('reply-indicator');
+        clearTimeout(typingTimer); // Clear timer on send
+        socket.emit('stop_typing', { community_id: communityId, username: username }); // Ensure typing indicator is cleared
+
+        const message = input.value.trim();
+        if (message) {
+            // Emit the message to the server
+            socket.emit('send_message', {
+                community_id: communityId,
+                username: username,
+                text: message,
+                reply_to_id: replyIndicator.dataset.replyToId || null
+            });
+            input.value = '';
+            // Clear reply state
+            replyIndicator.classList.add('hidden');
+            delete replyIndicator.dataset.replyToId;
+        }
+    });
+
+    // Handle incoming messages
+    socket.on('new_message', (data) => {
+        const isSelf = data.user_id === userId;
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message-wrapper flex group ' + (isSelf ? 'justify-end' : 'justify-start');
+        messageDiv.id = `message-${data.id}`;
+
+        let replyHtml = '';
+        if (data.reply_context) {
+            replyHtml = `
+                <div class="reply-context border-l-2 ${isSelf ? 'border-blue-300' : 'border-blue-500'} pl-2 mb-2 text-xs opacity-80">
+                    <div class="font-semibold">Replying to ${data.reply_context.username}</div>
+                    <div class="truncate">${data.reply_context.text}</div>
+                </div>
+            `;
+        }
+
+        messageDiv.innerHTML = `
+            <div class="relative ${isSelf ? 'bg-slate-900 text-white' : 'bg-slate-100 text-gray-900'} max-w-full sm:max-w-[70%] px-4 sm:px-5 py-3 rounded-2xl shadow-sm ${isSelf ? 'rounded-br-md' : 'rounded-bl-md'}">
+                ${replyHtml}
+                <div class="text-xs font-semibold mb-1 ${isSelf ? 'text-blue-200' : 'text-blue-700'}">${data.username}</div>
+                <div class="text-base break-words" data-message-content="${data.id}">${data.text}</div>
+                <div class="absolute top-0 right-0 -mt-2 mr-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                    <button class="reply-btn p-1 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/40" title="Reply" data-message-id="${data.id}" data-username="${data.username}" data-text="${data.text}">↩️</button>
+                    ${isSelf ? `
+                    <button class="edit-msg-btn p-1 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/40" title="Edit" data-message-id="${data.id}">✏️</button>
+                    <button class="delete-msg-btn p-1 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/40" title="Delete" data-message-id="${data.id}">🗑️</button>
+                    ` : ''}
+                </div>
+                <div class="text-[11px] mt-1 text-right ${isSelf ? 'text-blue-200' : 'text-gray-400'}">${(data.created_at || data.ts || '').split('T')[1].substring(0,5)}</div>
+            </div>
+        `;
+        messagesContainer.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    });
+
+    socket.on('message_deleted', (data) => {
+        const messageElement = document.getElementById(`message-${data.message_id}`);
+        if (messageElement) {
+            messageElement.remove();
+        }
+    });
+
+    socket.on('message_edited', (data) => {
+        const messageContent = document.querySelector(`[data-message-content="${data.message_id}"]`);
+        if (messageContent) {
+            messageContent.textContent = data.text;
+            // Add an 'edited' indicator
+            let timestampDiv = messageContent.parentElement.querySelector('.text-\\[11px\\]');
+            if (timestampDiv && !timestampDiv.querySelector('span.italic')) {
+                timestampDiv.insertAdjacentHTML('afterbegin', '<span class="italic">edited</span> ');
+            }
+        }
+    });
+
+    // --- Poll Logic ---
+    const pollModal = document.getElementById('poll-modal');
+    const createPollBtn = document.getElementById('create-poll-btn');
+    const cancelPollBtns = [document.getElementById('cancel-poll-btn'), document.getElementById('cancel-poll-btn-footer')];
+    const pollForm = document.getElementById('poll-form');
+    const addOptionBtn = document.getElementById('add-option-btn');
+    const optionsContainer = document.getElementById('poll-options-container');
+
+    const closePollModal = () => pollModal.classList.add('hidden');
+
+    createPollBtn.addEventListener('click', () => pollModal.classList.remove('hidden'));
+    cancelPollBtns.forEach(btn => btn.addEventListener('click', closePollModal));
+
+    addOptionBtn.addEventListener('click', () => {
+        const optionCount = optionsContainer.children.length + 1;
+        const newOptionDiv = document.createElement('div');
+        newOptionDiv.innerHTML = `
+            <label class="block text-sm font-medium text-gray-700">Option ${optionCount}</label>
+            <input type="text" name="options[]" required class="mt-1 block w-full border border-slate-300 rounded-lg shadow-sm px-3 py-2">
+        `;
+        optionsContainer.appendChild(newOptionDiv);
+    });
+
+    pollForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const question = document.getElementById('poll-question').value.trim();
+        const options = Array.from(document.querySelectorAll('input[name="options[]"]'))
+                             .map(input => input.value.trim())
+                             .filter(opt => opt);
+
+        if (question && options.length >= 2) {
+            socket.emit('create_poll', {
+                community_id: communityId,
+                question: question,
+                options: options
+            });
+            closePollModal();
+            pollForm.reset();
+            // Reset options to 2
+            while (optionsContainer.children.length > 2) {
+                optionsContainer.removeChild(optionsContainer.lastChild);
+            }
+        }
+    });
+
+    socket.on('new_poll', (data) => {
+        const isSelf = data.creator_name === username;
+        const wrapperDiv = document.createElement('div');
+        wrapperDiv.className = 'flex ' + (isSelf ? 'justify-end' : 'justify-start');
+
+        const pollDiv = document.createElement('div');
+        pollDiv.className = `max-w-[70%] p-4 my-2 rounded-2xl shadow-sm ${isSelf ? 'bg-slate-900 text-white rounded-br-md' : 'bg-white border rounded-bl-md'}`;
+        pollDiv.id = `poll-${data.poll_id}`;
+
+        let optionsHtml = '';
+        data.options.forEach(opt => {
+            optionsHtml += `
+              <div class="poll-option group flex items-center gap-2 cursor-pointer transition-all border rounded-lg px-3 py-2 ${isSelf ? 'border-slate-600 hover:bg-slate-700' : 'border-slate-200 hover:bg-slate-50'}"
+                   data-poll-id="${data.poll_id}" data-option-id="${opt.id}">
+                <div class="flex-1">
+                  <span class="font-medium">${opt.text}</span>
+                  <div class="w-full h-2 ${isSelf ? 'bg-slate-700' : 'bg-slate-100'} rounded mt-1">
+                    <div class="h-2 rounded bg-blue-500 transition-all" style="width: 0%"></div>
+                  </div>
+                </div>
+                <span class="ml-2 text-xs ${isSelf ? 'text-slate-300' : 'text-gray-500'} group-hover:text-blue-600 font-semibold">0 votes</span>
+              </div>
+            `;
+        });
+
+        pollDiv.innerHTML = `
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xs font-semibold ${isSelf ? 'text-blue-300' : 'text-blue-600'}">Poll by ${data.creator_name}</span>
+            </div>
+            <div class="font-bold text-lg mb-3">${data.question}</div>
+            <div class="space-y-2">${optionsHtml}</div>
+        `;
+
+        // Add delete button if the current user is the creator
+        if (isSelf) {
+            pollDiv.innerHTML += `
+                <div class="text-right mt-3">
+                    <button class="delete-poll-btn text-xs text-red-500 hover:underline" data-poll-id="${data.poll_id}">Delete Poll</button>
+                </div>
+            `;
+        }
+
+        wrapperDiv.appendChild(pollDiv);
+        messagesContainer.appendChild(wrapperDiv);
+    });
+
+    socket.on('poll_deleted', (data) => {
+        const pollElement = document.getElementById(`poll-${data.poll_id}`);
+        if (pollElement) {
+            pollElement.closest('.flex').remove(); // Remove the entire poll wrapper
+        }
+    });
+
+    socket.on('poll_update', (data) => {
+        const pollDiv = document.getElementById(`poll-${data.poll_id}`);
+        if (pollDiv) {
+            // Remove existing selection highlights before applying new one
+            pollDiv.querySelectorAll('.poll-option').forEach(el => el.classList.remove('ring-2', 'ring-blue-500', 'bg-blue-100'));
+
+            data.options.forEach(opt => {
+                const optionEl = pollDiv.querySelector(`.poll-option[data-option-id='${opt.id}']`);
+                if (optionEl) {
+                    optionEl.querySelector('span.font-semibold').textContent = `${opt.votes} votes`;
+                    optionEl.querySelector('.bg-blue-500').style.width = `${opt.percent}%`;
+                    if (opt.id == data.voted_option_id) {
+                         optionEl.classList.add('ring-2', 'ring-blue-500', 'bg-blue-100');
+                    }
+                }
+            });
+        }
+    });
+
+    // --- Typing Indicator Logic ---
+    const typingIndicator = document.getElementById('typing-indicator');
+    const typingUsers = new Set();
+
+    function updateTypingIndicator() {
+        if (typingUsers.size === 0) {
+            typingIndicator.textContent = '';
+        } else if (typingUsers.size === 1) {
+            typingIndicator.textContent = `${Array.from(typingUsers)[0]} is typing...`;
+        } else {
+            typingIndicator.textContent = `${typingUsers.size} people are typing...`;
+        }
+    }
+
+    socket.on('user_typing', (data) => {
+        typingUsers.add(data.username);
+        updateTypingIndicator();
+    });
+
+    socket.on('user_stopped_typing', (data) => {
+        typingUsers.delete(data.username);
+        updateTypingIndicator();
+    });
+
+    // Handle user join/leave notifications
+    socket.on('user_status', (data) => {
+        const statusDiv = document.createElement('div');
+        statusDiv.className = 'text-center text-sm text-gray-500 italic my-2';
+        statusDiv.textContent = data.message;
+        
+        messagesContainer.appendChild(statusDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        
+        // Remove status message after 5 seconds
+        setTimeout(() => {
+            if (statusDiv.parentNode) {
+                statusDiv.parentNode.removeChild(statusDiv);
+            }
+        }, 5000);
+    });
+
+    // --- Member List Update Logic ---
+    const membersList = document.getElementById('members-list');
+
+    socket.on('members_update', (online_members) => {
+        const onlineUsernames = new Set(online_members.map(m => m.username));
+        
+        // Update status indicators for all members in the list
+        const allMemberElements = membersList.querySelectorAll('li');
+        allMemberElements.forEach(li => {
+            const statusSpan = li.querySelector('.member-status');
+            const memberUsername = statusSpan.dataset.username;
+            if (onlineUsernames.has(memberUsername)) {
+                statusSpan.classList.replace('bg-gray-300', 'bg-green-500'); // Online
+            } else {
+                statusSpan.classList.replace('bg-green-500', 'bg-gray-300'); // Offline
+            }
+        });
+    });
+
+    // Add click listener for dynamically created poll options
+    messagesContainer.addEventListener('click', (e) => {
+        const optionDiv = e.target.closest('.poll-option');
+        if (optionDiv) {
+            const { pollId, optionId } = optionDiv.dataset;
+            socket.emit('submit_vote', { poll_id: pollId, option_id: optionId, community_id: communityId });
+        }
+
+        const deleteBtn = e.target.closest('.delete-poll-btn');
+        if (deleteBtn) {
+            if (confirm('Are you sure you want to delete this poll? This action cannot be undone.')) {
+                const { pollId } = deleteBtn.dataset;
+                socket.emit('delete_poll', { poll_id: pollId, community_id: communityId });
+            }
+        }
+
+        // Handle Reply Button Click
+        const replyBtn = e.target.closest('.reply-btn');
+        if (replyBtn) {
+            const { messageId, username, text } = replyBtn.dataset;
+            const replyIndicator = document.getElementById('reply-indicator');
+            
+            document.getElementById('reply-username').textContent = username;
+            document.getElementById('reply-text').textContent = text;
+            replyIndicator.dataset.replyToId = messageId;
+            
+            replyIndicator.classList.remove('hidden');
+            input.focus();
+        }
+
+        // Handle Delete Message Button Click
+        const deleteMsgBtn = e.target.closest('.delete-msg-btn');
+        if (deleteMsgBtn) {
+            if (confirm('Are you sure you want to delete this message?')) {
+                const { messageId } = deleteMsgBtn.dataset;
+                socket.emit('delete_message', { message_id: messageId, community_id: communityId });
+            }
+        }
+
+        // Handle Edit Message Button Click
+        const editMsgBtn = e.target.closest('.edit-msg-btn');
+        if (editMsgBtn) {
+            const { messageId } = editMsgBtn.dataset;
+            const messageContent = document.querySelector(`[data-message-content="${messageId}"]`).textContent;
+            
+            document.getElementById('edit-message-id').value = messageId;
+            document.getElementById('edit-message-input').value = messageContent;
+            document.getElementById('edit-modal').classList.remove('hidden');
+            document.getElementById('edit-message-input').focus();
+        }
+    });
+
+    document.getElementById('cancel-reply-btn').addEventListener('click', () => {
+        const replyIndicator = document.getElementById('reply-indicator');
+        replyIndicator.classList.add('hidden');
+        delete replyIndicator.dataset.replyToId;
+    });
+
+    // --- Edit Modal Logic ---
+    const editModal = document.getElementById('edit-modal');
+    const editForm = document.getElementById('edit-form');
+    const cancelEditBtn = document.getElementById('cancel-edit-btn');
+
+    const closeEditModal = () => editModal.classList.add('hidden');
+
+    cancelEditBtn.addEventListener('click', closeEditModal);
+
+    editForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const messageId = document.getElementById('edit-message-id').value;
+        const newText = document.getElementById('edit-message-input').value.trim();
+
+        if (newText) {
+            socket.emit('edit_message', { message_id: messageId, text: newText, community_id: communityId });
+            closeEditModal();
+        }
+    });
+
+    // Handle window close
+    window.addEventListener('beforeunload', () => {
+        socket.emit('leave_community', {
+            community_id: communityId,
+            user_id: userId,
+            username: username
+        });
+    });
+
+    // Auto-dismiss flash messages that might appear on this page
+    document.addEventListener('DOMContentLoaded', function() {
+        // This targets a potential flash message container.
+        // This code assumes your base.html renders flashes in a div with class "space-y-4" which contains the flash messages.
+        const flashContainer = document.querySelector('.flashes, .flash-messages');
+        if (flashContainer) {
+            setTimeout(() => {
+                flashContainer.style.transition = 'opacity 0.5s ease';
+                flashContainer.style.opacity = '0';
+                setTimeout(() => flashContainer.remove(), 500); // Remove from DOM after fade
+            }, 2000); // 2 seconds
+        }
+    });
+</script>
+<style>
+    #chat-messages {
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e0 #f7fafc;
+    }
+    #chat-messages::-webkit-scrollbar {
+        width: 6px;
+    }
+    #chat-messages::-webkit-scrollbar-track {
+        background: #f7fafc;
+    }
+    #chat-messages::-webkit-scrollbar-thumb {
+        background-color: #cbd5e0;
+        border-radius: 3px;
+    }
+    .poll-option.selected, .poll-option.ring-2 {
+        background: #e0f2fe !important;
+        border-color: #3b82f6 !important;
+        color: #0f172a !important; /* slate-900, for text visibility */
+    }
+  @media (max-width: 768px) {
+    .flex-col {
+      flex-direction: column;
+    }
+    .md\:w-1\/4 {
+      width: 100%;
+    }
+</style>
+{% endblock %}

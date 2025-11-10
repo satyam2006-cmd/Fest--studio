@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fest[Studio] — Creative Events</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;800&family=Oswald:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #fdfcf7; /* soft cream background */
+        --ink: #0b3d2e; /* deep forest green (text & accents) */
+        --line: #d8e2d1; /* soft greenish line */
+        --brand: #14532d; /* strong forest green accents */
+        --maxw: 1200px;
+        --radius: 18px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: Inter, system-ui, Segoe UI, Arial, sans-serif;
+        line-height: 1.6;
+      }
+
+      /* Utility */
+      .container {
+        max-width: var(--maxw);
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+      .grid {
+        display: grid;
+        gap: 28px;
+      }
+      .btn {
+        display: inline-block;
+        background: var(--brand);
+        color: #fff;
+        text-decoration: none;
+        padding: 12px 18px;
+        border-radius: 999px;
+        font-weight: 600;
+      }
+
+      .hair {
+        border-top: 1px solid var(--line);
+      }
+
+      /* Header */
+      header.site {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        background: rgba(246, 244, 237, 0.92);
+        backdrop-filter: saturate(180%) blur(10px);
+        border: 1px solid var(--line);
+        border-radius: 0 0 25px 25px; /* round corners at bottom */
+        margin: 0 12px; /* small spacing from screen edges */
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 64px;
+        position: relative;
+      }
+      nav img {
+        height: 50px;
+      }
+      .brand {
+        font-family: Oswald, Inter, sans-serif;
+        font-weight: 700;
+        letter-spacing: 0.6px;
+      }
+      .brand b {
+        background: #111;
+        color: #fff;
+        padding: 2px 6px;
+        border-radius: 8px;
+        margin-right: 4px;
+      }
+      nav.links {
+        display: flex;
+        gap: 22px;
+      }
+      nav.links a {
+        color: var(--ink);
+        text-decoration: none;
+        font-size: 14px;
+      }
+      .menu-btn {
+        display: none;
+      }
+
+      /* Hero */
+      .hero {
+        padding: 72px 0 48px;
+      }
+      .hero .wrap {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 40px;
+        align-items: center;
+      }
+      .hero h1 {
+        font-family: Oswald, Inter, sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: min(64px, 9vw);
+        line-height: 1;
+        margin: 0 0 10px;
+      }
+      .hero p {
+        margin: 0 0 18px;
+        max-width: 58ch;
+        color: #444;
+      }
+      .hero img {
+        max-width: 100%;
+        height: auto;
+        border-radius: var(--radius);
+      }
+
+      /* About */
+      .about {
+        padding: 48px 0;
+        background-color: #0b3d2e;
+      }
+      .about h2 {
+        font-family: Oswald, Inter, sans-serif;
+        text-transform: uppercase;
+        font-size: min(54px, 8vw);
+        color: #f0edde;
+        margin: 0 0 12px;
+      }
+      .about .intro {
+        max-width: 850px;
+        display: grid;
+        gap: 14px;
+        color: #f9f1c8;
+      }
+
+      .testimonials {
+        max-width: 1200px;
+        margin: 40px auto;
+        border: 1px solid forestgreen;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        overflow: hidden;
+      }
+
+      .card {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        padding: 30px 20px;
+        justify-content: space-between;
+      }
+
+      /* vertical dividers */
+      .card:not(:last-child) {
+        border-right: 1px solid darkgreen;
+      }
+
+      .card img {
+        width: 240px;
+        height: 240px;
+        border-radius: 50%;
+        border-bottom-left-radius: 0px;
+        object-fit: cover;
+        margin: 0 auto 20px;
+      }
+
+      /* line between image and text */
+      .divider {
+        width: 60px;
+        height: 2px;
+        background: #ccc;
+        margin: 0 auto 20px;
+      }
+
+      .card p {
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 20px;
+        line-height: 1.5;
+      }
+
+      .card h3 {
+        font-size: 15px;
+        font-weight: 600;
+      }
+
+      @media (max-width: 900px) {
+        .testimonials {
+          grid-template-columns: 1fr;
+        }
+
+        .card:not(:last-child) {
+          border-right: none;
+          border-bottom: 1px solid #ccc;
+        }
+      }
+
+      /* Team Section Layout Adjustments */
+      .team-content {
+        display: flex;
+        align-items: flex-start; /* Align items to the top */
+        gap: 40px; /* Space between member info and description */
+        text-align: left; /* Reset text alignment for content inside */
+      }
+      .member-info { /* Left side */
+        flex: 0 0 250px; /* Fixed width for member info, adjust as needed */
+        max-width: 100%; /* Ensure it doesn't overflow on small screens */
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Center member details within its column */
+      }
+      .member-description { /* Right side */
+        flex: 1; /* Takes remaining space */
+        color: #f9f1c8;
+      }
+
+      /* Responsive for team section */
+      @media (max-width: 768px) {
+        .team-content {
+          flex-direction: column; /* Stack vertically on small screens */
+          align-items: center; /* Center items when stacked */
+          gap: 20px;
+        }
+        .member-info {
+          flex: none; /* Remove fixed width */
+          width: 100%; /* Take full width */
+        }
+        .member-description {
+          text-align: center; /* Center text on small screens */
+        }
+      }
+      /* Team Section */
+      .team {
+        padding: 60px 0;
+        background-color: #0b3d2e;
+        text-align: center;
+      }
+      .team h2 {
+        font-family: Oswald, sans-serif;
+        text-transform: uppercase;
+        font-size: min(54px, 8vw);
+        margin-bottom: 40px;
+        color: #f5f3e9;
+      }
+      .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 32px;
+        justify-items: center;
+        color: #f9f1c8;
+      }
+      .member {
+        text-align: center;
+        max-width: 220px;
+        color: #f9f1c8;
+      }
+      .member img {
+        width: 200px;
+        height: 220px;
+        border-top-left-radius: 10%;
+        border-bottom-right-radius: 10%;
+        object-fit: cover;
+        border: 4px solid var(--line);
+        margin-bottom: 12px;
+      }
+      .member h4 {
+        margin: 8px 0 4px;
+        font-size: 16px;
+        color: #f9f1c8;
+        font-weight: 700;
+      }
+      .member p {
+        margin: 0;
+        font-size: 13px;
+        color: #f9f1c8;
+      }
+      .memberpara {
+        color: #f9f1c8;
+      }
+
+      /* Gallery */
+      .gallery {
+        padding: 44px 0;
+      }
+      .gallery h3 {
+        font-family: Oswald, sans-serif;
+        text-transform: uppercase;
+        margin: 0 0 16px;
+      }
+      .thumbs {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+      }
+      .thumbs img {
+        width: 100%;
+        height: auto;
+        border: 4px solid #0b3d2e;
+        border-radius: var(--radius);
+        object-fit: cover;
+        display: block;
+      }
+
+      /* Contact */
+      .contact {
+        padding: 56px 0 80px;
+      }
+      .contact .box {
+        background: #fdfcf7;
+        padding: 24px;
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 28px;
+        align-items: center;
+      }
+      .contact h3 {
+        font-family: Oswald, sans-serif;
+        text-transform: uppercase;
+        margin: 0 0 10px;
+      }
+
+      /* Footer */
+      footer {
+        border-top: 1px solid var(--line);
+        padding: 16px 0 28px;
+        color: #777;
+        font-size: 13px;
+      }
+
+      /* Responsive */
+      @media (max-width: 1000px) {
+        .hero .wrap,
+        .contact .box {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .hero img {
+          max-width: 90%;
+          margin: 0 auto;
+        }
+        .cards {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      @media (max-width: 640px) {
+        .nav {
+          height: 56px;
+        }
+        nav.links {
+          display: none;
+          flex-direction: column;
+          gap: 12px;
+          position: absolute;
+          top: 56px;
+          right: 16px;
+          background: var(--bg);
+          border: 1px solid var(--line);
+          padding: 12px 16px;
+          border-radius: 12px;
+        }
+        .menu-btn {
+          display: block;
+        }
+        .hero {
+          padding: 56px 0 32px;
+          text-align: center;
+        }
+        .cards {
+          grid-template-columns: 1fr;
+        }
+        .thumbs {
+          grid-template-columns: 1fr;
+        }
+        .container {
+          padding: 0 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="site">
+      <div class="container nav">
+        <div class="brand">Our<b>Team</b></div>
+        <nav class="links">
+          <a href="{{ url_for('home') }}">Home</a>
+          <a href="#about">About</a>
+          <a href="#services">Services</a>
+          <a href="#team">Team</a>
+          <a href="#contact">Contact</a>
+        </nav>
+        <button class="menu-btn btn">Menu</button>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section id="home" class="hero">
+      <div class="container wrap">
+        <div>
+          <h1>Ideas → Events.<br />Seamless. Memorable.</h1>
+          <p>
+            Fest[Studio] helps you plan, host, and scale events — from college
+            festivals and cultural shows to weddings and corporate meets — with
+            modern tools and thoughtful design.
+          </p>
+          <a href="#contact" class="btn">Start Your Event</a>
+        </div>
+        <div>
+          <div class="photo-band" style="overflow: hidden">
+            <img
+              src="{{ url_for('static', filename='logo.png') }}"
+              alt="Hero event"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section id="about" class="about">
+      <div class="container">
+        <h2>ABOUT US.</h2>
+        <div class="intro">
+          <p>
+            Fest[Studio] is a modern event platform that turns planning chaos
+            into calm execution. We merge creativity with technology to simplify
+            registrations, schedules, and on-ground experience.
+          </p>
+          <p>
+            Whether it’s a campus fest, cultural program, wedding, or product
+            launch, we design journeys that feel effortless for hosts and
+            unforgettable for guests.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services -->
+    <section id="services" class="services hair">
+      <div class="container" style="padding-top: 28px">
+        <h3>What we do</h3>
+      </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="testimonials">
+      <div class="card">
+        <img
+          src="https://static.vecteezy.com/system/resources/previews/024/775/541/non_2x/planning-strategy-and-time-management-planning-schedule-business-event-and-calendar-concept-people-with-schedules-pens-and-notes-setting-up-meetings-illustration-in-flat-cartoon-design-vector.jpg"
+          alt="Client photo"
+        />
+        <div class="divider"></div>
+        <p>
+          Theme ideation, timelines, budgets, and guest journeys designed for
+          impact and clarity.
+        </p>
+        <h3>Event Strategy & Design</h3>
+      </div>
+
+      <div class="card">
+        <img
+          src="https://www.shutterstock.com/image-vector/people-airport-ground-staff-marshaller-600nw-2427278425.jpg"
+          alt="Client photo"
+        />
+        <div class="divider"></div>
+        <p>
+          Stage flow, artist coordination, vendor management, and post-event
+          analytics.
+        </p>
+        <h3>On-Ground Ops</h3>
+      </div>
+
+      <div class="card">
+        <img
+          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQLNJRaXaMQGftqGggwH0hogN_5ktRj2w2oFA&s"
+          alt="Client photo"
+        />
+        <div class="divider"></div>
+        <p>
+          Landing pages, registrations, QR check-ins, announcements, and live
+          schedules.
+        </p>
+        <h3>Digital Stack</h3>
+      </div>
+    </section>
+
+    <!-- Team -->
+    <section id="team" class="team">
+      <div class="container">
+        <h2>The Team.</h2>
+        <div class="team-content">
+          <div class="member-info">
+            <div class="member">
+              <img src="{{ url_for('static', filename='megatron.jpg') }}" />
+              <h4>Satyam Bhagat</h4>
+              <p>Founder & Project Lead</p>
+            </div>
+          </div>
+          <div class="member-description">
+            <p>
+              I'm a focused individual blending design, engineering, and
+              operations to deliver events that run on time and feel intentional.
+              Tools should help, not get in the way — that’s my north star.
+            </p>
+            <p>
+              From concept to curtain call, I obsess over the details: smart
+              registration flows, crisp on-site ops, and a closing loop with
+              insights for your next event.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Gallery -->
+    <section id="gallery" class="gallery hair">
+      <div class="container">
+        <h3>Recent Works In :</h3>
+        <div class="thumbs">
+          <img
+            src="{{ url_for('static', filename='Hackathon.png') }}"
+            alt="Event 1"
+          />
+          <img
+            src="{{ url_for('static', filename='colleges.png') }}"
+            alt="Event 2"
+          />
+          <img
+            src="{{ url_for('static', filename='others.png') }}"
+            alt="Event 3"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="contact">
+      <div class="container box">
+        <div>
+          <h3>Let's plan your event</h3>
+          <p class="muted">
+            Tell us about your goals and timeline. We’ll reply with a plan and a
+            clear budget.
+          </p>
+          <h2>Mail us @ studiosfest@gmail.com</h2>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div
+        class="container"
+        style="
+          display: flex;
+          justify-content: space-between;
+          gap: 16px;
+          flex-wrap: wrap;
+        "
+      >
+        <div>
+          © Fest[Studio] — Connecting people through unforgettable events.
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Mobile Menu Toggle
+      document.querySelector(".menu-btn")?.addEventListener("click", () => {
+        const links = document.querySelector("nav.links");
+        if (!links) return;
+        links.style.display = links.style.display === "flex" ? "none" : "flex";
+      });
+    </script>
+  </body>
+</html>

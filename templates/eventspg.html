@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fest[Studio]</title>
+    <style>
+      /* --- Global resets / helpers (fix phantom right gap) --- */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 100%;
+        overflow-x: hidden;
+      }
+      img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Times New Roman", serif;
+        background-color: #f6f4ed;
+        overflow-x: hidden;
+        scroll-behavior: smooth;
+      }
+
+      /* Navigation */
+      nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px 50px;
+        border-bottom: 1px solid #0e3216;
+        background-color: #f6f4ed;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1001; /* Adjusted z-index */
+      }
+      nav img {
+        height: 50px;
+      }
+      .nav-links {
+        display: flex;
+        gap: 40px;
+        font-size: 18px;
+        align-items: center;
+      }
+      .nav-links a {
+        text-decoration: none;
+        color: #0e3216;
+      }
+      .nav-links a:hover {
+        text-decoration: underline;
+      }
+
+      /* Hero */
+      .hero {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        z-index: 500;
+        pointer-events: none;
+      }
+      .hero h1 {
+        font-size: 64px;
+        font-weight: 400;
+        margin: 0;
+        color: #0e3216;
+      }
+      .hero h1 span {
+        display: block;
+      }
+      .hero p {
+        font-style: italic;
+        margin-top: 10px;
+        font-size: 20px;
+      }
+      .divider {
+        width: 1px;
+        background-color: black;
+        height: 250px;
+        margin: 20px auto;
+      }
+
+      /* Scrolling images */
+      section {
+        display: flex;
+        align-items: center;
+        min-height: 100vh;
+        position: relative;
+        z-index: 1;
+      }
+      .left-align {
+        justify-content: flex-start;
+        padding-left: 10%;
+      }
+      .right-align {
+        justify-content: flex-end;
+        padding-right: 10%;
+      }
+      section img {
+        width: 50%;
+        max-width: 450px;
+        opacity: 0;
+        transform: translateY(120px);
+        transition: transform 1s ease-out, opacity 1s ease-out;
+      }
+      section img.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* Event details (RIGHT PANEL FIX) */
+      .details-section {
+        display: grid; /* Use grid to avoid flex min-content overflow quirks */
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        height: 100dvh; /* mobile-safe viewport */
+        position: relative;
+        background-color: #f6f4ed;
+        border: 2px solid #0e3216;
+        z-index: 600;
+      }
+      .details-left {
+        /* no fixed width; grid gives it 1fr */
+        background-color: #f6f4ed;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border-right: 2px solid #0e3216;
+        position: sticky;
+        top: 0;
+        height: 100dvh;
+        z-index: 2;
+        min-width: 0; /* prevent overflow pushing the right panel */
+      }
+      .details-left p {
+        font-size: 24px;
+        font-style: italic;
+        margin-top: 10px;
+      }
+
+      .details-right {
+        /* no fixed width; grid gives it 1fr */
+        min-width: 0; /* KEY: allows content to shrink and removes phantom right gap */
+        overflow-y: auto;
+        scroll-snap-type: y mandatory;
+        height: 100dvh;
+        background-color: #f6f4ed;
+        -ms-overflow-style: none; /* IE/Edge */
+        scrollbar-width: none; /* Firefox */
+        scrollbar-gutter: stable both-edges; /* avoid layout shift/gap due to scrollbar */
+      }
+      .details-right::-webkit-scrollbar {
+        width: 0;
+        height: 0;
+      }
+
+      .details-slide {
+        height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        scroll-snap-align: start;
+        background-color: #f6f4ed;
+        border-bottom: 1px solid #0e3216;
+        padding: 12px;
+        text-align: center;
+      }
+      .details-slide img {
+        max-width: 90%;
+        max-height: 70%;
+        object-fit: contain;
+      }
+      .details-slide p {
+        margin: 16px 0 0;
+        font-size: 18px;
+        color: #0e3216;
+      }
+
+      /* Our story */
+      .our-story {
+        height: 100vh;
+        background-color: #c7d1d1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        flex-direction: column;
+        z-index: 3000;
+      }
+      .our-story::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        width: 1px;
+        background-color: #1e2a2a;
+        z-index: 0;
+      }
+      .our-story h2 {
+        font-size: 48px;
+        font-weight: normal;
+        color: #0f1c1c;
+        letter-spacing: 2px;
+        z-index: 1;
+        background-color: #c7d1d1;
+        padding: 0 20px;
+      }
+
+      /* Shared split section */
+      .section-split {
+        display: flex;
+        align-items: stretch;
+        height: 100vh;
+        background-color: #f6f4ed;
+        position: relative;
+        border: 2px solid #0e3216;
+        z-index: 700;
+      }
+      .section-split::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: calc(50% - 1px);
+        width: 1px;
+        background-color: #0e3216;
+        z-index: 5;
+      }
+      .section-image,
+      .section-text {
+        flex: 0 0 50%;
+        position: relative;
+      }
+      .section-image {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #f6f4ed;
+        padding: 20px;
+      }
+      .section-image img {
+        width: auto;
+        height: auto;
+        max-width: 90%;
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+        border-top-left-radius: 70px;
+        border-top-right-radius: 70px;
+        border-bottom-right-radius: 70px;
+      }
+      .section-text {
+        padding: 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background-color: #f6f4ed;
+        z-index: 10;
+      }
+      .section-text h2 {
+        font-size: 48px;
+        font-family: "Playfair Display", serif;
+        font-weight: normal;
+        font-style: italic;
+        margin-bottom: 20px;
+        color: #0e3216;
+      }
+      .section-text p {
+        font-size: 18px;
+        line-height: 1.8;
+        color: #0e3216;
+        max-width: 500px;
+      }
+
+      /* Flip layout only for Fast Forward */
+      #fastforward {
+        flex-direction: row-reverse;
+      }
+      #fastforward .section-text {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-end;
+        padding: 60px;
+        text-align: right;
+      }
+
+      /* Ribbon-style vertical strip without corner rounding */
+      .section-split .section-image {
+        position: relative;
+      }
+      .section-split .section-image::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 80px;
+        background-color: #0e3216;
+        z-index: 0; /* behind image */
+      }
+      #fastforward .section-image::after {
+        left: auto;
+        right: 0;
+      }
+      .section-split .section-image img {
+        position: relative;
+        z-index: 1;
+      }
+
+      .last {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        height: 80vh;
+      }
+      .last-content {
+        position: relative;
+        display: inline-block;
+      }
+      .last h1 {
+        font-size: clamp(7rem, 21vw, 21rem);
+        margin: 0;
+        line-height: 1.05;
+        font-weight: 200;
+        color: #0e3216;
+      }
+      .cta-btn {
+        position: absolute;
+        top: 60%;
+        left: 52%;
+        transform: translate(-50%, -50%);
+        padding: 14px 32px;
+        border: 2px solid #0e3216;
+        border-radius: 550px;
+        background: #f6f4ed;
+        color: #0e3216;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .cta-btn:hover {
+        background: #1a4624;
+        color: #fff;
+      }
+
+      /* DIVIDER */
+      .last {
+        z-index: 600;
+        background-color: #f6f4ed;
+      }
+      .lastdivider,
+      footer {
+        position: relative;
+        z-index: 1000;
+        background-color: #f6f4ed;
+      }
+      .lastdivider {
+        border-top: 1px solid #0e3216;
+      }
+
+      /* FOOTER */
+      footer {
+        text-align: center;
+        padding: 20px 10px;
+        color: #0e3216;
+      }
+      .footer-top {
+        display: flex;
+        justify-content: center;
+        gap: 60px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+      }
+      .footer-column {
+        text-align: left;
+      }
+      .footer-column h4 {
+        margin-bottom: 10px;
+        font-size: 1rem;
+        font-weight: bold;
+      }
+      .footer-column a {
+        display: block;
+        text-decoration: none;
+        color: #0e3216;
+        margin: 4px 0;
+      }
+      .footer-column a:hover {
+        text-decoration: underline;
+      }
+      .footer-bottom {
+        font-size: 0.9rem;
+      }
+
+      /* Small screens: keep nav tidy */
+      @media (max-width: 640px) {
+        nav {
+          padding: 12px 16px;
+        }
+        .nav-links {
+          gap: 16px;
+          font-size: 16px;
+        }
+      }
+      @media (min-width: 768px) {
+        .split-container {
+          display: flex;
+        }
+
+        .left-panel {
+          flex: 1;
+          border-right: 1px solid #234123;
+          padding: 2rem;
+        }
+
+        .right-panel {
+          flex: 1;
+          padding: 2rem;
+        }
+      }
+      @media (max-width: 767px) {
+        .split-container {
+          display: block;
+        }
+
+        .left-panel {
+          border-right: none;
+          border-bottom: 1px solid #234123;
+          padding: 1.5rem;
+        }
+
+        .right-panel {
+          padding: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="flex justify-between items-center px-4 sm:px-12 py-3 border-b border-[#0e3216] bg-[#f6f4ed] fixed top-0 left-0 w-full z-[1001]">
+      <a href="{{ url_for('home') }}">
+        <img
+          src="{{ url_for('static', filename='collabratives.png') }}"
+          alt="Fest Studio Logo"
+          class="h-10 sm:h-12"
+        />
+      </a>
+      <!-- Navigation Links (visible on all screen sizes, adapts with flex-wrap) -->
+      <div class="nav-links">
+        <!-- <a href="{{ url_for('home') }}" class="nav-links">All Events</a> -->
+        <a href="#event-details" class="nav-links">Event Details</a>
+        <a href="#fastforward" class="nav-links">Highlights</a>
+        <a href="#proposal" class="nav-links">Agenda</a>
+        <a href="#last" class="nav-links">FAQs</a>
+      </div>
+    </nav>
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="divider"></div>
+      <h1>
+        <span>{{ event.hero_text_line1 or 'Fest' }}</span>
+        <span>{{ event.hero_text_line2 or "Studio's" }}</span>
+      </h1>
+      <p>Event Collaborations : FestStudios</p>
+      <div class="divider"></div>
+    </div>
+
+    <!-- Scrolling image sections -->
+    <section class="left-align"></section>
+   <section class="right-align">
+      {% if event.parallax_img_1 %}
+        <img src="{{ event.parallax_img_1 }}" alt="Parallax Image 1" />
+      {% else %}
+        <img src="{{ url_for('static', filename='eveimg1.jpg') }}" alt="Default Image 1" />
+      {% endif %}
+    </section>
+   <section class="left-align">
+      {% if event.parallax_img_2 %}
+        <img src="{{ event.parallax_img_2 }}" alt="Parallax Image 2" />
+      {% else %}
+        <img src="{{ url_for('static', filename='eveimg2.jpg') }}" alt="Default Image 2" />
+      {% endif %}
+   </section>
+   <section class="right-align">
+      {% if event.parallax_img_3 %}
+        <img src="{{ event.parallax_img_3 }}" alt="Parallax Image 3" />
+      {% else %}
+        <img src="{{ url_for('static', filename='eveimg3.jpg') }}" alt="Default Image 3" />
+      {% endif %}
+   </section>
+    <section class="right-align"></section>
+
+    <!-- Event Details -->
+
+    <div class="details-section" id="event-details">
+      <div class="details-left">
+        <img
+          src="{{ url_for('static', filename='eventdetails.png') }}"
+          alt=""
+        />
+        <p>All about to Know</p>
+      </div>
+      <div class="details-right" id="details-scroll">
+        <div class="details-slide">
+          <img
+            src="{{ url_for('static', filename='evedetails.png') }}"
+            alt="Slide 1"
+          />
+        </div>
+        <div class="details-slide">
+          <img
+            src="{{ url_for('static', filename='loc.png') }}"
+            alt="Location"
+          />
+          <p>{{ event.venue if event else '' }}</p>
+        </div>
+        <div class="details-slide">
+          <img src="{{ url_for('static', filename='date.png') }}" alt="Date" />
+          <p>{{ event.event_datetime | format_event_date_part(session.get('user', {}).get('timezone', 'UTC')) }}</p>
+        </div>
+        <div class="details-slide">
+          <img src="{{ url_for('static', filename='time.png') }}" alt="Time" />
+          <p>{{ event.event_datetime | format_event_time_part(session.get('user', {}).get('timezone', 'UTC')) }}</p>
+        </div>
+        <!-- Under event type/category -->
+      </div>
+    </div>
+
+    <!-- Our Story -->
+    <section class="our-story">
+      <h2>OUR STORY</h2>
+    </section>
+
+    <!-- How We Planned -->
+    <section class="section-split">
+      <div class="section-image">
+        <img
+          src="{{ url_for('static', filename='howweplanned.jpg') }}"
+          alt="How we planned"
+        />
+      </div>
+      <div class="section-text">
+        <h2>How we planned</h2>
+        <p>
+          {{ event.how_we_planned_text or "This is a space to share more about the event: who's behind it, what it entails, and what this site has to offer." }}
+        </p>
+      </div>
+    </section>
+
+    <!-- Fast Forward -->
+    <section id="fastforward" class="section-split">
+      <div class="section-image">
+        <img
+          src="{{ url_for('static', filename='fastforwardto.jpg') }}"
+          alt="fastforwardto"
+        />
+      </div>
+      <div class="divider"></div>
+      <div class="section-text">
+        <h2>Fast forward to</h2>
+        <p>
+          {{ event.category or 'Use this section to jump ahead in the timeline — a highlight from the big day, a turning point, or a cherished moment.' }}
+        <br>
+         <a
+          href="{{ event.registration_link }}"
+          target="_blank"
+          class="register-btn"
+          >Register Here</a
+        >
+        </p>
+      </div>
+    </section>
+
+    <!-- Agenda -->
+    <section id="proposal" class="section-split">
+      <div class="section-image">
+        <img
+          src="{{ url_for('static', filename='agenda.jpg') }}"
+          alt="agenda"
+        />
+      </div>
+      <div class="section-text">
+        <h2>Agenda</h2>
+        <p>
+          {{ event.agenda or 'Tell the moment it all changed — the words, the place, the feeling. Showcase the details that made it uniquely yours.' }}
+        </p>
+      </div>
+    </section>
+
+    <section id="last" class="last">
+      <div class="last-content">
+        <h1>Let’s Talk</h1>
+        <button class="cta-btn">KNOW MORE</button>
+      </div>
+    </section>
+
+    <!-- DIVIDER -->
+    <div class="lastdivider"></div>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-top">
+        <div class="footer-column">
+          <img
+            src="{{ url_for('static', filename='collabratives.png') }}"
+            alt="Collaboratives"
+          />
+        </div>
+        <div class="footer-column">
+          <h4>MENU</h4>
+          <a href="#">About</a>
+          <a href="#">Services</a>
+          <a href="#">Host events</a>
+          <a href="#">Contact Us</a>
+        </div>
+        <div class="footer-column">
+          <h4>CONTACT</h4>
+          <p>Organizer: {{ event.host_name if event else 'N/A' }}</p>
+          <p>
+            Hosting Community:<br />{{ event.host_email if event and event.host_email else 'studiosfest@gmail.com' }}
+          </p>
+        </div>
+        <div class="footer-column">
+          <h4>INFO</h4>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms & Conditions</a>
+          <a href="#">Accessibility Statement</a>
+        </div>
+      </div>
+      <div class="footer-bottom">© 2025 FestStudios. Made with ❤️</div>
+    </footer>
+
+    <script>
+      // Reveal images
+      const elements = document.querySelectorAll("section img");
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("show");
+            }
+          });
+        },
+        { threshold: 0 }
+      );
+      elements.forEach((el) => observer.observe(el));
+
+      // Force scroll through Event Details first
+      const detailsScroll = document.getElementById("details-scroll");
+      let allowNextSection = false;
+
+      detailsScroll.addEventListener("scroll", () => {
+        if (
+          detailsScroll.scrollTop + detailsScroll.clientHeight >=
+          detailsScroll.scrollHeight
+        ) {
+          allowNextSection = true;
+        }
+      });
+
+      window.addEventListener(
+        "wheel",
+        (e) => {
+          const eventDetails = document.getElementById("event-details");
+          const rect = eventDetails.getBoundingClientRect();
+          if (rect.top <= 0 && !allowNextSection && e.deltaY > 0) {
+            e.preventDefault();
+            detailsScroll.scrollBy({
+              top: detailsScroll.clientHeight,
+              behavior: "smooth",
+            });
+          }
+        },
+        { passive: false }
+      );
+
+      // --- DYNAMIC COUNTDOWN TIMER ---
+      // This function will only run if we are not in preview mode and have a valid event object.
+      {% if not is_preview and event and event.date and event.time %}
+      function initializeCountdown() {
+        // Combine date and time from the event object to create a valid ISO string
+        const eventDateTimeString = `{{ event.date }}T{{ event.time }}`;
+        const eventDate = new Date(eventDateTimeString).getTime();
+
+        function updateCountdown() {
+          const now = new Date().getTime();
+          const timeLeft = eventDate - now;
+
+          if (timeLeft <= 0) {
+            // You can replace this with a proper countdown display element if you add one
+            console.log("The event has started or is over!");
+            // Example: document.getElementById("countdown").innerHTML = "<h2>The event is live!</h2>";
+            clearInterval(countdownInterval); // Stop the timer
+            return;
+          }
+
+          const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+          // Update your countdown elements here.
+          // Example:
+          // if (document.getElementById("days")) {
+          //   document.getElementById("days").textContent = String(days).padStart(2, "0");
+          //   document.getElementById("hours").textContent = String(hours).padStart(2, "0");
+          //   document.getElementById("minutes").textContent = String(minutes).padStart(2, "0");
+          //   document.getElementById("seconds").textContent = String(seconds).padStart(2, "0");
+          // }
+        }
+
+        const countdownInterval = setInterval(updateCountdown, 1000);
+        updateCountdown(); // Run once immediately
+      }
+      
+      // Run the countdown initialization when the page loads
+      document.addEventListener('DOMContentLoaded', initializeCountdown);
+      {% endif %}
+      // --- END DYNAMIC COUNTDOWN TIMER ---
+
+      const $parallax = Array.from(
+        document.querySelectorAll("[data-parallax]")
+      );
+      const lerp = (a, b, t) => a + (b - a) * t;
+      const state = new Map($parallax.map((el) => [el, 0]));
+
+      function onScroll() {
+        const vh = window.innerHeight;
+        $parallax.forEach((el) => {
+          const speed = parseFloat(el.dataset.speed || 0.25);
+          const rect = el.parentElement.getBoundingClientRect();
+          const centerDelta = rect.top + rect.height / 2 - vh / 2;
+          const target = -centerDelta * speed;
+          const cur = state.get(el) || 0;
+          const next = lerp(cur, target, 0.08);
+          state.set(el, next);
+          el.style.transform = `translateY(${next.toFixed(2)}px)`;
+        });
+      }
+
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add("in");
+            }
+          });
+        },
+        { threshold: 0.15 }
+      );
+
+      document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+
+      let ticking = false;
+      window.addEventListener(
+        "scroll",
+        () => {
+          if (!ticking) {
+            window.requestAnimationFrame(() => {
+              onScroll();
+              ticking = false;
+            });
+            ticking = true;
+          }
+        },
+        { passive: true }
+      );
+      onScroll();
+
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        window.removeEventListener("scroll", onScroll);
+        $parallax.forEach((el) => {
+          el.style.transform = "none";
+        });
+      }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      $(".cta-btn").on("mouseenter", function () {
+        $(this).text("studiosfest@gmail.com");
+      });
+      $(".cta-btn").on("mouseleave", function () {
+        $(this).text("KNOW MORE");
+      });
+    </script>
+  </body>
+  {% if is_preview %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const previewDataString = sessionStorage.getItem('eventPreviewData');
+      if (previewDataString) {
+        const event = JSON.parse(previewDataString);
+
+        // Helper to update text content
+        const updateText = (selector, value, fallback = '') => {
+          const el = document.querySelector(selector);
+          if (el) el.textContent = value || fallback;
+        };
+
+        // Helper to update image source
+        const updateImgSrc = (selector, value) => {
+          const el = document.querySelector(selector);
+          if (el && value) el.src = value;
+        };
+
+        // Populate the page with preview data
+        updateText('.hero h1 span:first-child', event.hero_text_line1, 'Fest');
+        updateText('.hero h1 span:last-child', event.hero_text_line2, "Studio's");
+        updateImgSrc('section.right-align:nth-of-type(1) img', event.parallax_img_1);
+        updateImgSrc('section.left-align:nth-of-type(2) img', event.parallax_img_2);
+        updateImgSrc('section.right-align:nth-of-type(2) img', event.parallax_img_3);
+        updateText('.details-slide:nth-of-type(2) p', event.venue);
+        updateText('.details-slide:nth-of-type(3) p', event.date);
+        updateText('.details-slide:nth-of-type(4) p', event.time);
+        updateText('.section-text h2:contains("How we planned") + p', event.how_we_planned_text);
+        updateText('#fastforward .section-text p', event.category);
+        updateText('#proposal .section-text p', event.agenda);
+        document.querySelector('#fastforward .register-btn')?.setAttribute('href', event.registrationLink || '#');
+        updateText('footer .footer-column:nth-of-type(3) p:first-of-type', `Organizer: ${event.hostName || 'N/A'}`);
+        updateText('footer .footer-column:nth-of-type(3) p:last-of-type', `Hosting Community:\n${event.hostEmail || 'studiosfest@gmail.com'}`);
+
+        // Clean up sessionStorage after use
+        sessionStorage.removeItem('eventPreviewData');
+      }
+    });
+  </script>
+  {% endif %}
+
+
+
+</html>

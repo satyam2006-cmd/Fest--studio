@@ -1,0 +1,16 @@
+Flask
+Flask-SocketIO
+Flask-WTF
+Flask-Limiter
+gunicorn
+supabase
+python-dotenv
+psycopg2-binary
+Pillow
+APScheduler
+pytz
+requests
+qrcode
+eventlet
+werkzeug
+Jinja2

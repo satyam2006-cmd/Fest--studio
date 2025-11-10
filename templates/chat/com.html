@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="space-y-6 px-2 sm:px-4">
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <h2 class="text-2xl font-bold">Communities</h2>
+        <div class="flex gap-2 flex-wrap">
+            <a href="{{ url_for('chat.create_community') }}" class="rounded-full border-2 border-black bg-white text-black px-4 py-2 text-sm font-semibold hover:bg-black hover:text-white transition">Create Community</a>
+            <button id="join-private-btn" class="rounded-full border-2 border-black bg-white text-black px-4 py-2 text-sm font-semibold hover:bg-black hover:text-white transition">Join Private Community</button>
+        </div>
+    </div>
+
+    <!-- Modal for join code input -->
+    <div id="join-private-modal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+        <form id="join-private-form" method="POST" action="{{ url_for('chat.join_private') }}" class="bg-white p-6 rounded shadow-lg flex flex-col gap-4 w-80">
+            {{ form.hidden_tag() }}
+            <h3 class="font-bold text-lg">Join Private Community</h3>
+            <input type="text" name="code" placeholder="Enter join code" required class="border rounded px-3 py-2">
+            <div class="flex gap-2 justify-end">
+                <button type="button" id="cancel-join-private" class="rounded-full border-2 border-black bg-white text-black px-3 py-1 font-semibold hover:bg-black hover:text-white transition">Cancel</button>
+                <button type="submit" class="rounded-full border-2 border-black bg-white text-black px-3 py-1 font-semibold hover:bg-black hover:text-white transition">Join</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        {% for community in communities %}
+        <div class="rounded-2xl border-2 border-black bg-white shadow-sm p-6 flex flex-col h-full">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="text-xs px-2 py-1 rounded-full {% if community.visibility == 'public' %}bg-green-100 text-green-800{% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                    {{ community.visibility|capitalize }}
+                </span>
+                {% if community.is_creator %}
+                    <span class="ml-auto text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">You are the creator</span>
+                {% endif %}
+            </div>
+            <h3 class="font-bold text-lg mb-1">{{ community.name }}</h3>
+            <p class="text-sm text-slate-600 mb-3 flex-1">{{ community.description or "No description" }}</p>
+            {% if community.visibility == 'private' and community.is_creator and community.join_code %}
+                <div class="text-xs text-yellow-700 mb-2">
+                    Join Code: <span class="font-mono font-medium select-all">{{ community.join_code }}</span>
+                </div>
+            {% endif %}
+            <div class="flex flex-wrap gap-2 mt-auto">
+                {% if community.is_member or community.is_creator %}
+                    <a href="{{ url_for('chat.community', cid=community.id) }}" 
+                       class="rounded-full border-2 border-black bg-white text-black px-3 py-1 text-sm font-semibold hover:bg-black hover:text-white transition">Open Chat</a>
+                    {% if community.is_creator %}
+                        <form method="POST" action="{{ url_for('chat.delete_community', cid=community.id) }}" class="inline">
+                            {{ form.hidden_tag() }}
+                            <button type="submit" class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-white text-red-600 rounded-full hover:bg-red-100 transition-colors border border-black" title="Delete Community" onclick="return confirm('Are you sure you want to permanently delete this community? This cannot be undone.');">
+                                &#128465; <!-- Trash can icon -->
+                            </button>
+                        </form>
+                    {% endif %}
+                {% elif community.visibility == 'public' %}
+                    <form method="POST" action="{{ url_for('chat.join_public', cid=community.id) }}" class="inline">
+                        {{ form.hidden_tag() }}
+                        <button type="submit" class="rounded-full border-2 border-black bg-white text-black px-3 py-1 text-sm font-semibold hover:bg-black hover:text-white transition">Join</button>
+                    </form>
+                {% endif %}
+                {% if not community.is_member and community.visibility == 'private' and not community.is_creator %}
+                    <form method="POST" action="{{ url_for('chat.join_private') }}" class="flex gap-2">
+                        {{ form.hidden_tag() }}
+                        <input type="hidden" name="community_id" value="{{ community.id }}">
+                        <input type="text" name="code" placeholder="Enter join code" required
+                               class="text-sm border rounded px-2 py-1 flex-1">
+                        <button type="submit" class="rounded-full border-2 border-black bg-white text-black px-3 py-1 text-sm font-semibold hover:bg-black hover:text-white transition">
+                            Join Private
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    // Show modal
+    document.getElementById('join-private-btn').onclick = function() {
+        document.getElementById('join-private-modal').classList.remove('hidden');
+    };
+    // Hide modal
+    document.getElementById('cancel-join-private').onclick = function() {
+        document.getElementById('join-private-modal').classList.add('hidden');
+    };
+</script>
+{% endblock %}

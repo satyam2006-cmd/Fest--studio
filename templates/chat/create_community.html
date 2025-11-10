@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white p-8 rounded-2xl border border-black shadow-sm">
+        <h2 class="text-2xl font-bold mb-1">Create a New Community</h2>
+        <p class="text-sm text-slate-600 mb-6">Build a space for your friends or the public to connect.</p>
+
+        <form method="POST" action="{{ url_for('chat.create_community') }}" class="space-y-6">
+            {{ form.hidden_tag() }}
+
+            <div>
+                <label for="name" class="block text-sm font-medium text-slate-700">Community Name</label>
+                <div class="mt-1">
+                    <input type="text" name="name" id="name" required
+                           class="block w-full border border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2">
+                </div>
+            </div>
+
+            <div>
+                <label for="description" class="block text-sm font-medium text-slate-700">Description</label>
+                <div class="mt-1">
+                    <textarea id="description" name="description" rows="3"
+                              class="block w-full border border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2"></textarea>
+                </div>
+                <p class="mt-2 text-xs text-slate-500">A brief description of what your community is about.</p>
+            </div>
+
+            <fieldset>
+                <legend class="text-sm font-medium text-slate-700">Visibility</legend>
+                <div class="mt-2 space-y-2">
+                    <div class="flex items-center">
+                        <input id="visibility-public" name="is_private" type="radio" value="0" checked class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-slate-300">
+                        <label for="visibility-public" class="ml-3 block text-sm text-slate-700">Public - Anyone can join.</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input id="visibility-private" name="is_private" type="radio" value="1" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-slate-300">
+                        <label for="visibility-private" class="ml-3 block text-sm text-slate-700">Private - Requires a join code.</label>
+                    </div>
+                </div>
+            </fieldset>
+
+            <div class="flex justify-end">
+                <button type="submit" class="rounded-full bg-slate-900 text-white px-6 py-2 text-sm font-semibold hover:bg-slate-800 transition-colors">Create Community</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

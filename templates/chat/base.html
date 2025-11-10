@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>FestCircle</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/general.css') }}">
+  </head>
+  <body class="bg-slate-50 text-slate-800">
+    <div class="min-h-screen flex flex-col">
+      <header class="bg-white border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex items-center justify-between h-16 relative">
+           <div class="flex items-center">
+            <a href="/" class="text-xl font-bold tracking-tight">Fest Circle</a>
+             <nav class="hidden md:flex gap-2 text-sm text-slate-600 ml-4">
+              <a href="{{ url_for('chat.chat_index') }}" class="px-2 py-1 rounded hover:bg-slate-100">Dashboard</a>
+              <a href="{{ url_for('chat.communities') }}" class="px-2 py-1 rounded hover:bg-slate-100">Communities</a>
+             </nav>
+
+              <!-- Mobile Menu (Hidden by default) -->
+              <div id="mobile-menu" class="absolute top-full right-0 bg-white shadow-md rounded-md mt-2 py-2 w-48 hidden">
+                <a href="{{ url_for('chat.chat_index') }}" class="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-100">Dashboard</a>
+                <a href="{{ url_for('chat.communities') }}" class="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-100">Communities</a>
+              </div>
+            </div>
+
+            <div class="flex items-center">
+              {% if session.get('user') %}
+              <button id="mobile-menu-button" class="md:hidden px-3 py-1 rounded hover:bg-slate-100 text-sm text-slate-600">&#9776;</button>
+              <a href="{{ url_for('chat.chat_logout') }}" class="text-sm px-3 py-1 rounded-full bg-slate-900 text-white">Logout</a>
+              {% else %}
+                <a href="{{ url_for('signin') }}" class="text-sm px-3 py-1 rounded-full bg-slate-900 text-white">Login</a>
+                <a href="{{ url_for('signin') }}" class="text-sm px-3 py-1 rounded border">Register</a>
+              {% endif %}
+            </div>
+            <!-- <button id="mobile-menu-button" class="md:hidden px-3 py-1 rounded hover:bg-slate-100 text-sm text-slate-600">&#9776;</button> -->
+          </div>
+        </div>
+      </header>
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const mobileMenuButton = document.getElementById('mobile-menu-button');
+          const mobileMenu = document.getElementById('mobile-menu');
+          mobileMenuButton.addEventListener('click', function() {
+            // Toggle the menu's visibility
+            mobileMenu.classList.toggle('hidden');
+          });
+        });
+      </script>
+      <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        <div class="space-y-4">
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              <div class="space-y-2">
+                {% for category, message in messages %}
+                  <div class="rounded-md p-3 {% if category == 'error' %}bg-red-50 border border-red-200 text-red-800{% elif category == 'success' %}bg-green-50 border border-green-200 text-green-800{% else %}bg-slate-50 border text-slate-800{% endif %}">
+                    {{ message }}
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endwith %}
+        </div>
+        {% block content %}{% endblock %}
+      </main>
+      <footer class="bg-white border-t">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-xs text-slate-500">
+          © {{ 2025 }} Fest Circle 
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

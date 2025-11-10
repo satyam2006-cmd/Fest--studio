@@ -1,0 +1,8 @@
+/* Custom CSS for chat application */
+/* This file prevents 404 errors - you can customize it as needed */
+
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Add any custom styles here */

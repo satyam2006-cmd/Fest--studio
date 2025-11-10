@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fest [STUDIO] — Welcome</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              cream: "#f3f1eb",
+              forest: "#15341c",
+            },
+          },
+        },
+      };
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='Logo.png') }}"
+      type="image/png"
+    />
+  </head>
+
+  <body class="bg-cream font-sans text-forest">
+    <div class="max-w-6xl mx-auto p-6">
+      <!-- Hero Text and Avatar -->
+      <div class="flex justify-between items-center">
+        <h1 class="text-5xl font-bold">Welcome, {{ session['user'].get('username') or session['user'].get('email') }}!</h1>
+      </div>
+
+      <!-- Main Cards with Custom Grid -->
+      <div class="mt-4 grid grid-cols-1 md:grid-cols-[40%_60%] gap-6">
+        <!-- Left Card -->
+        <div
+          class="bg-cream border border-forest text-forest p-6 rounded-2xl flex flex-col shadow"
+        >
+          <div class="flex mb-4">
+            <img
+              src="{{ url_for('static', filename='img3.png') }}"
+              class="w-44 h-44 object-cover rounded-xl"
+            />
+          </div>
+          <h2 class="text-2xl font-semibold">Host an Event</h2>
+          <p class="mt-2 opacity-80">
+            Colab with FestStudio to host events like professionals
+          </p>
+          <a href="{{ url_for('host_event') }}">
+            <button
+              class="mt-4 font-semibold text-left underline hover:text-[#2d5f39] transition"
+            >
+              Host now →
+            </button>
+          </a>
+        </div>
+
+        <!-- Right Side with Two Stacked Cards -->
+        <div class="flex flex-col gap-6">
+          <!-- Upper Card -->
+          <div class="bg-white border border-forest p-6 rounded-2xl shadow">
+            <div class="flex justify-center mb-4">
+              <img
+                src="{{ url_for('static', filename='img2.png') }}"
+                class="w-48 h-48 object-cover rounded-lg"
+              />
+            </div>
+            <h2 class="text-2xl font-semibold text-forest">Unfold with Us</h2>
+            <p class="mt-2 text-forest/80">Gentle readings about us</p>
+            <a href="{{ url_for('ourteam') }}">
+              <button
+                class="mt-4 font-semibold text-left text-forest underline hover:text-[#2d5f39] transition"
+              >
+                Let's Go! →
+              </button>
+            </a>
+          </div>
+
+          <!-- Lower Card -->
+          <div class="bg-forest text-cream p-6 rounded-2xl shadow">
+            <div class="flex justify-center mb-4">
+              <img
+                src="{{ url_for('static', filename='img1.png') }}"
+                class="w-48 h-48 object-cover rounded-lg"
+              />
+            </div>
+            <h2 class="text-2xl font-semibold">
+              Your brain learns as you scroll
+            </h2>
+            <a href="{{ url_for('home') }}#featured-events">
+              <button
+                class="mt-4 font-semibold text-left text-[#e0d8c2] underline hover:text-[#c4b692] transition"
+              >
+                Explore Events! →
+              </button>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </body>
+</html>

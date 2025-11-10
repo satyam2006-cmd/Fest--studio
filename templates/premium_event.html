@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FEST[STUDIO] - Host a Premium Event</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Ubuntu", sans-serif;
+        background-color: #f3f1eb;
+        color: #15341c;
+        height: 100vh;
+        display: flex;
+      }
+      .main-container {
+        display: flex;
+        flex: 1;
+        height: 100vh;
+        width: 100vw;
+      }
+      .left-image {
+        flex: 1;
+        background-color: #15341c;
+        background-image: url('{{ url_for("static", filename="form_host.png") }}');
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+      }
+      .divider {
+        width: 2px;
+        background-color: #15341c;
+      }
+      .right-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 30px 40px;
+        background-color: #f3f1eb;
+        overflow-y: auto;
+      }
+      .top-decor {
+        width: 180px;
+        margin-bottom: 20px;
+      }
+      form {
+        width: 100%;
+        max-width: 450px;
+      }
+      form h3 {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-top: 2rem;
+        margin-bottom: 0.5rem;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 0.5rem;
+      }
+      form label {
+        display: block;
+        margin-top: 15px;
+        font-weight: bold;
+        color: #15341c;
+      }
+      form input,
+      form select,
+      form textarea {
+        width: 100%;
+        padding: 12px 14px;
+        margin-top: 5px;
+        border: 1px solid #15341c;
+        border-radius: 6px;
+        font-size: 14px;
+        background-color: #f3f1eb;
+        color: #15341c;
+        box-sizing: border-box;
+        height: 45px;
+      }
+      form textarea {
+        resize: vertical;
+        min-height: 80px;
+        height: auto;
+      }
+      .schedule-row {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+      }
+      .schedule-row .field {
+        flex: 1;
+      }
+      .time-container {
+        display: flex;
+        gap: 10px;
+      }
+      .time-container input,
+      .time-container select {
+        flex: 1;
+        height: 45px;
+      }
+      .cta {
+        margin-top: 25px;
+        padding: 12px 18px;
+        background: #f3f1eb;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+        border-radius: 50px;
+      }
+      .cta span {
+        position: relative;
+        font-size: 18px;
+        font-weight: 700;
+        color: #1d4d2b;
+        padding: 4px 8px;
+        border-radius: 4px;
+      }
+      .cta svg {
+        margin-left: 10px;
+        stroke: #f3f1eb;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        transform: translateX(-5px);
+        transition: all 0.3s ease;
+      }
+      .cta:hover {
+        background: #1d4d2b;
+      }
+      .cta:hover span {
+        color: #f3f1eb;
+      }
+      .cta:hover svg {
+        transform: translateX(0);
+      }
+      @media (max-width: 768px) {
+        .main-container {
+          flex-direction: column;
+        }
+        .divider {
+          width: 100%;
+          height: 2px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main-container">
+      <div class="left-image"></div>
+      <div class="divider"></div>
+      <div class="right-content">
+        <img
+          class="top-decor"
+          src="{{ url_for('static', filename='formlogo.png') }}"
+          alt="top-decoration"
+        />
+        <form id="event-form" method="POST" enctype="multipart/form-data">
+          {{ form.hidden_tag() }}
+          
+          <h3>Core Event Details</h3>
+          <label for="eventName">Event Name</label>
+          <input type="text" id="eventName" name="eventName" required />
+
+          <label for="hostName">Host Name</label>
+          <input type="text" id="hostName" name="hostName" required />
+
+          <label for="hostEmail">Your Email</label>
+          <input type="email" id="hostEmail" name="hostEmail" required />
+
+          <label for="venue">Venue</label>
+          <input type="text" id="venue" name="venue" required />
+
+          <label for="agenda">Agenda</label>
+          <textarea id="agenda" name="agenda" rows="3" required></textarea>
+
+          <div class="schedule-row">
+            <div class="field">
+              <label for="date">Date</label>
+              <input type="date" id="date" name="date" required />
+            </div>
+            <div class="field">
+              <label for="time">Time</label>
+              <input type="time" id="time" name="time" required />
+            </div>
+          </div>
+          
+          <label for="timezone">Event Timezone</label>
+          <select id="timezone" name="timezone" required>
+            <!-- Timezones will be populated by JavaScript -->
+          </select>
+          <script>
+            // Simple script to populate timezones
+            const timezoneSelect = document.getElementById('timezone');
+            const timezones = Intl.supportedValuesOf('timeZone');
+            timezones.forEach(tz => {
+              const option = new Option(tz, tz);
+              timezoneSelect.add(option);
+            });
+            // Set a default based on user's browser
+            timezoneSelect.value = Intl.DateTimeFormat().resolvedOptions().timeZone;
+          </script>
+
+          <label for="category">Event Category</label>
+          <input type="text" id="category" name="category" placeholder="e.g., Technical Workshop, Cultural Fest" required />
+
+          <label for="registrationLink">Registration Link</label>
+          <input type="url" id="registrationLink" name="registrationLink" placeholder="https://..." required />
+
+          <h3>Page Customization</h3>
+
+          <label for="event_logo">Main Event Logo</label>
+          <input type="file" id="event_logo" name="event_logo" accept="image/*" required />
+
+          <label for="hero_text_line1">Hero Text Line 1</label>
+          <input type="text" id="hero_text_line1" name="hero_text_line1" value="Fest" />
+
+          <label for="hero_text_line2">Hero Text Line 2</label>
+          <input type="text" id="hero_text_line2" name="hero_text_line2" value="Studio's" />
+
+          <label for="parallax_img_1">Parallax Image 1</label>
+          <input type="file" id="parallax_img_1" name="parallax_img_1" accept="image/*" />
+          <label for="parallax_img_2">Parallax Image 2</label>
+          <input type="file" id="parallax_img_2" name="parallax_img_2" accept="image/*" />
+          <label for="parallax_img_3">Parallax Image 3</label>
+          <input type="file" id="parallax_img_3" name="parallax_img_3" accept="image/*" />
+
+          <label for="how_we_planned_text">"How We Planned" Section Text</label>
+          <textarea id="how_we_planned_text" name="how_we_planned_text" rows="3"></textarea>
+
+          <div style="display: flex; gap: 10px; margin-top: 25px;">
+            <button id="preview-btn" type="button" class="cta" style="flex: 1;">
+              <span>Preview</span>
+            </button>
+            <button class="cta" type="submit" style="flex: 1;">
+              <span>Host Event</span>
+              <svg width="15px" height="10px" viewBox="0 0 13 10">
+                <path d="M1,5 L11,5"></path>
+                <polyline points="8 1 12 5 8 9"></polyline>
+              </svg>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <script>
+      document.getElementById('preview-btn').addEventListener('click', async function() {
+        const form = document.getElementById('event-form');
+        const formData = new FormData(form);
+        const fileInputs = form.querySelectorAll('input[type="file"]');
+        const previewData = {};
+
+        // Asynchronously read file inputs as Data URLs
+        const filePromises = Array.from(fileInputs).map(input => {
+            return new Promise(resolve => {
+                if (input.files && input.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve({ name: input.name, value: e.target.result });
+                    reader.readAsDataURL(input.files[0]);
+                } else {
+                    resolve(null); // Resolve with null if no file
+                }
+            });
+        });
+
+        // Wait for all files to be read
+        const fileResults = await Promise.all(filePromises);
+
+        // Build a plain object from the form data
+        for (const [key, value] of formData.entries()) {
+            if (typeof value !== 'object') { // Exclude original file objects
+                previewData[key] = value;
+            }
+        }
+
+        // Add the Data URLs for the images
+        fileResults.forEach(result => {
+            if (result) {
+                previewData[result.name] = result.value;
+            }
+        });
+
+        // Store the data in sessionStorage
+        sessionStorage.setItem('eventPreviewData', JSON.stringify(previewData));
+
+        // Construct the preview URL
+        const previewUrl = "{{ url_for('event_preview') }}";
+
+        // Open the preview in a new tab
+        window.open(previewUrl, '_blank');
+      });
+    </script>
+  </body>
+</html>

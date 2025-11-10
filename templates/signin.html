@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fest [STUDIO] — Sign In</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              cream: "#f3f1eb",
+              forest: "#0c3416",
+            },
+          },
+        },
+      };
+    </script>
+
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='logo.png') }}"
+      type="image/png"
+    />
+
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body class="bg-cream font-sans h-full text-forest">
+    <div class="flex flex-col h-full">
+      <div
+        class="flex flex-col md:flex-row flex-grow items-center justify-center px-4 py-6 gap-8 md:gap-10"
+      >
+        <!-- Left: Intro Video -->
+        <div class="w-full md:w-1/2 max-w-lg">
+          <video
+            autoplay
+            muted
+            playsinline
+            id="introVideo"
+            class="w-full h-auto rounded"
+          >
+            <source
+              src="{{ url_for('static', filename='intro.mp4') }}"
+              type="video/mp4"
+            />
+          </video>
+        </div>
+
+        <!-- Right: Login/Register Section -->
+        <div
+          class="w-full md:w-1/2 max-w-lg flex flex-col justify-center items-center"
+        >
+          <img
+            src="{{ url_for('static', filename='logo.png') }}"
+            alt="Logo"
+            class="w-48 md:w-72 mb-4"
+          />
+
+          <!-- Flash Messages -->
+          {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+          <div class="w-full mb-4">
+            {% for category, message in messages %}
+            <div
+              class="p-2 mb-2 rounded {% if category == 'success' %} bg-green-100 text-green-800 border border-green-300 {% elif category == 'danger' %} bg-red-100 text-red-800 border border-red-300 {% elif category == 'warning' %} bg-yellow-100 text-yellow-800 border border-yellow-300 {% else %} bg-gray-100 text-gray-800 border border-gray-300 {% endif %}"
+            >
+              {{ message }}
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+          {% endwith %}
+
+          <!-- Login Form -->
+          <form
+            id="loginForm"
+            action="{{ url_for('chat.chat_login', next=request.args.get('next', '')) }}"
+            method="POST"
+            class="w-full space-y-4"
+          >
+            {{ form.hidden_tag() }}
+            <input type="hidden" name="next" value="{{ request.args.get('next', '') }}">
+            <div class="form-group">
+              <label for="email" class="block text-sm font-medium text-forest">Email</label>
+              <input
+                name="login_input"
+                type="text"
+                placeholder="Email or Username"
+                required
+                class="mt-1 block w-full p-2 border border-forest rounded bg-cream text-forest placeholder-forest"
+              />
+            </div>
+            <div class="form-group">
+              <label for="password" class="block text-sm font-medium text-forest">Password</label>
+              <input
+                name="password"
+                type="password"
+                placeholder="Password"
+                required
+                class="mt-1 block w-full p-2 border border-forest rounded bg-cream text-forest placeholder-forest"
+              />
+            </div>
+            <button
+              type="submit"
+              class="w-full bg-forest text-cream py-2 rounded hover:bg-[#145228] transition"
+            >
+              Login
+            </button>
+          </form>
+
+          <!-- Register Form -->
+          <form
+            id="registerForm"
+            action="{{ url_for('register') }}"
+            method="POST"
+            class="w-full space-y-4 hidden"
+          >
+            {{ form.hidden_tag() }}
+            <input
+              name="username"
+              type="text"
+              placeholder="Username"
+              required
+              class="w-full p-2 border border-forest rounded bg-cream text-forest placeholder-forest"
+            />
+            <input
+              name="email"
+              type="email"
+              placeholder="Email"
+              required
+              class="w-full p-2 border border-forest rounded bg-cream text-forest placeholder-forest"
+            />
+
+            <input
+              id="regPassword"
+              name="password"
+              type="password"
+              placeholder="Password"
+              required
+              class="w-full p-2 border border-forest rounded bg-cream text-forest placeholder-forest"
+            />
+            <p id="passwordHelp" class="text-sm text-red-600"></p>
+
+            <input
+              id="confirmPassword"
+              name="confirm_password"
+              type="password"
+              placeholder="Confirm Password"
+              required
+              class="w-full p-2 border border-forest rounded bg-cream text-forest placeholder-forest"
+            />
+            <p id="confirmHelp" class="text-sm text-red-600"></p>
+
+            <button
+              id="registerButton"
+              type="submit"
+              class="w-full bg-forest text-cream py-2 rounded hover:bg-[#145228] transition"
+            >
+              Register
+            </button>
+          </form>
+
+          <!-- Toggle Links -->
+          <p class="text-sm text-forest mt-2" id="showRegisterLink">
+            Don't have an account?
+            <button
+              type="button"
+              onclick="showRegister()"
+              class="text-[#145228] font-semibold"
+            >
+              Register
+            </button>
+          </p>
+          <p class="text-sm text-forest mt-2 hidden" id="showLoginLink">
+            Already have an account?
+            <button
+              type="button"
+              onclick="showLogin()"
+              class="text-[#145228] font-semibold"
+            >
+              Login
+            </button>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("introVideo")
+        .addEventListener("ended", function () {
+          this.pause();
+        });
+
+      function showRegister() {
+        document.getElementById("loginForm").classList.add("hidden");
+        document.getElementById("registerForm").classList.remove("hidden");
+        document.getElementById("showRegisterLink").classList.add("hidden");
+        document.getElementById("showLoginLink").classList.remove("hidden");
+      }
+
+      function showLogin() {
+        document.getElementById("registerForm").classList.add("hidden");
+        document.getElementById("loginForm").classList.remove("hidden");
+        document.getElementById("showLoginLink").classList.add("hidden");
+        document.getElementById("showRegisterLink").classList.remove("hidden");
+      }
+
+      const pwInput = document.getElementById("regPassword");
+      const confirmInput = document.getElementById("confirmPassword");
+      const pwHelp = document.getElementById("passwordHelp");
+      const confirmHelp = document.getElementById("confirmHelp");
+      const registerButton = document.getElementById("registerButton");
+
+      pwInput.addEventListener("input", () => {
+        const pw = pwInput.value;
+        let msg = "";
+        if (pw.length < 8) {
+          msg = "Password must be at least 8 characters.";
+          pwHelp.className = "text-sm text-red-600";
+        } else if (!/[A-Za-z]/.test(pw) || !/[0-9]/.test(pw)) {
+          msg = "Password must include letters and numbers.";
+          pwHelp.className = "text-sm text-red-600";
+        } else {
+          msg = "✅ Strong password";
+          pwHelp.className = "text-sm text-green-600";
+        }
+        pwHelp.textContent = msg;
+        validatePasswords();
+      });
+
+      confirmInput.addEventListener("input", () => {
+        validatePasswords();
+      });
+
+      function validatePasswords() {
+        if (confirmInput.value !== pwInput.value) {
+          confirmHelp.textContent = "Passwords do not match.";
+          confirmHelp.className = "text-sm text-red-600";
+          registerButton.disabled = true;
+          registerButton.classList.add("opacity-50", "cursor-not-allowed");
+        } else {
+          confirmHelp.textContent = "✅ Passwords match";
+          confirmHelp.className = "text-sm text-green-600";
+          registerButton.disabled = false;
+          registerButton.classList.remove("opacity-50", "cursor-not-allowed");
+        }
+      }
+    </script>
+  </body>
+</html>
