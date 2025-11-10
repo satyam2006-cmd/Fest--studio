@@ -37,7 +37,7 @@ Fest[Studio] is a full-stack web application designed for hosting events and bui
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-username/Fest--studio.git
+    git clone https://github.com/satyam2006-cmd/Fest--studio.git
     cd Fest--studio
     ```
 
