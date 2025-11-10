@@ -544,5 +544,8 @@ if __name__ == "__main__":
     # For testing, you can set it to 'interval', minutes=1
     scheduler.add_job(cleanup_past_events, 'interval', minutes=1)
     scheduler.start()
-
-    socketio.run(app, debug=True)
+    
+    # The 'startCommand' in render.yaml will use Gunicorn in production.
+    # This block is now only for local development.
+    # The host='0.0.0.0' makes it accessible on your local network.
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)

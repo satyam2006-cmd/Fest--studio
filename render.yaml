@@ -1,0 +1,29 @@
+services:
+  # A Web Service for the main Flask application
+  - type: web
+    name: fest-studio
+    env: python
+    # The region to deploy to. Options: oregon, frankfurt, ohio, singapore
+    region: oregon
+    plan: free # Or 'starter' for more resources
+    buildCommand: "pip install -r requirements.txt"
+    # The command to start the Gunicorn server.
+    # We use the eventlet worker for Flask-SocketIO compatibility.
+    startCommand: "gunicorn --worker-class eventlet -w 1 app:app"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.5 # Match your local Python version
+      - key: SESSION_COOKIE_SECURE
+        value: "true" # Important for production
+      - key: SUPABASE_URL
+        fromService:
+          type: external_service
+          name: supabase-fest-studio
+          envVarKey: SUPABASE_URL
+      - key: SUPABASE_KEY
+        fromService:
+          type: external_service
+          name: supabase-fest-studio
+          envVarKey: SUPABASE_KEY
+      # You can add other secrets like SECRET_KEY and WTF_CSRF_SECRET_KEY here
+      # or directly in the Render dashboard for better security.
