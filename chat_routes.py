@@ -687,6 +687,7 @@ def register_socketio_handlers(socketio_instance):
                 'reply_context': reply_context
             }, to=room)
 
+
     @socketio_instance.on('edit_message')
     def on_edit_message(data):
         user_id = session.get('user_id')
