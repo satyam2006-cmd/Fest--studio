@@ -478,6 +478,14 @@ def create_app():
             app.logger.error(f"Could not inject hosted events: {e}")
         return dict(user_hosted_events=None)  # Always return a dictionary
 
+    # Register chat blueprint so its endpoints (e.g. chat.chat_index) exist
+    # regardless of how the app is started (dev server, gunicorn, Render, etc.).
+    try:
+        app.register_blueprint(chat_bp, url_prefix='/chat')
+    except Exception:
+        # If registration fails for any unexpected reason, log but continue.
+        app.logger.exception('Could not register chat blueprint during app creation')
+
     return app
 
 
@@ -526,9 +534,7 @@ def cleanup_past_events():
 # --- Background Scheduler for Cleanup Tasks ---
 if __name__ == "__main__":
     socketio = SocketIO(app)
-
-    # Register chat blueprint and SocketIO handlers
-    app.register_blueprint(chat_bp, url_prefix='/chat') # This seems to be missing from your file, adding it back.
+    # Register SocketIO handlers (blueprint already registered in create_app)
     register_socketio_handlers(socketio)
 
     # Initialize chat database tables
