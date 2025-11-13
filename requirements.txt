@@ -14,3 +14,7 @@ qrcode
 eventlet
 werkzeug
 Jinja2
+flask-socketio
+python-socketio
+eventlet
+gunicorn
