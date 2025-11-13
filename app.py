@@ -23,7 +23,8 @@ from flask import (
     current_app, 
     jsonify, 
     send_from_directory,
-    session  # Add this import
+    session,  # Add this import
+    g
 )
 from flask_wtf.csrf import CSRFProtect, CSRFError, generate_csrf
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -488,8 +489,21 @@ def create_app():
 
     return app
 
-
 app = create_app()
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
+
+# Register SocketIO handlers after the app and socketio objects are created
+register_socketio_handlers(socketio)
+
+# --- One-time Initialization ---
+# This ensures that database verification and seeding runs only once per process.
+@app.before_request
+def initialize_app():
+    # The 'g' object is a request-specific global. We use it to store a flag.
+    if not hasattr(g, '_initialized'):
+        verify_supabase_tables()
+        seed_default_communities()
+        g._initialized = True
 
 # --- New Deletion Logic (moved to global scope) ---
 def delete_event_and_storage_python_helper(event_id, user_id=None):
@@ -533,15 +547,6 @@ def cleanup_past_events():
 
 # --- Background Scheduler for Cleanup Tasks ---
 if __name__ == "__main__":
-    socketio = SocketIO(app)
-    # Register SocketIO handlers (blueprint already registered in create_app)
-    register_socketio_handlers(socketio)
-
-    # Initialize chat database tables
-    with app.app_context():
-        verify_supabase_tables()  # Verify Supabase tables
-        seed_default_communities() # Create default communities
-
     logging.info("Running at http://localhost:5000")
 
     # Initialize and start the scheduler
