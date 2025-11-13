@@ -490,7 +490,7 @@ def create_app():
     return app
 
 app = create_app()
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")
 
 # Register SocketIO handlers after the app and socketio objects are created
 register_socketio_handlers(socketio)
