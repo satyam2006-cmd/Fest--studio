@@ -175,7 +175,7 @@
 
 <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
 <script>
-    const socket = io({ transports: ['polling'] });
+    const socket = io(window.location.origin, { transports: ["polling"] });
     const communityId = {{ community.id|tojson }};
     const userId = '{{ user.id }}';
     const username = '{{ user.username or user.email }}';
