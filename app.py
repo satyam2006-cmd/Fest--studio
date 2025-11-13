@@ -559,4 +559,6 @@ if __name__ == "__main__":
     # The 'startCommand' in render.yaml will use Gunicorn in production.
     # This block is now only for local development.
     # The host='0.0.0.0' makes it accessible on your local network.
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    socketio.run(app, host="0.0.0.0", port=port)
+
