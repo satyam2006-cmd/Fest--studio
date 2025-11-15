@@ -8,7 +8,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Deployment: Railway](https://img.shields.io/badge/Deploy-Railway-purple.svg)](https://railway.app/)
 
-Fest[Studio] is a full-stack web application for hosting events and building real-time chat communities, powered by Flask and Supabase. It allows users to create customizable event pages and engage through a feature-rich chat system.
+Fest[Studio] is a full-stack web application for planning your events and building real-time chat communities, powered by Flask and Supabase. It allows users to create customizable event pages and engage through a feature-rich chat system.
 
 🔗 **Live Demo:** **https://web-production-aa741.up.railway.app**
 
@@ -16,7 +16,7 @@ Fest[Studio] is a full-stack web application for hosting events and building rea
 
 ## ✨ Features
 
-### 🎪 Event Hosting
+### 🎪 Event Planning
 
 - **Create & Manage Events**: Host events with details like title, venue, agenda, schedule, and images.
 - **Custom Event Pages**: Each event gets a dedicated, modern landing page with beautiful parallax scrolling effects.
