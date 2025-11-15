@@ -1,101 +1,141 @@
 # Fest[Studio] 🎉
 
-Fest[Studio] is a full-stack web application designed for hosting events and building real-time chat communities, powered by Flask and Supabase. It provides a platform for users to create, manage, and promote events with customizable event pages. Additionally, it features a robust community chat system with features like public/private groups, real-time messaging, polls, and user profiles.
+[![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-Framework-black.svg)](https://flask.palletsprojects.com/)
+[![Supabase](https://img.shields.io/badge/Supabase-Backend-green.svg)](https://supabase.io/)
+[![Socket.IO](https://img.shields.io/badge/Real--Time-Socket.IO-orange.svg)](https://socket.io/)
+[![TailwindCSS](https://img.shields.io/badge/Frontend-TailwindCSS-38B2AC.svg)](https://tailwindcss.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Deployment: Railway](https://img.shields.io/badge/Deploy-Railway-purple.svg)](https://railway.app/)
 
-## Features
+Fest[Studio] is a full-stack web application for hosting events and building real-time chat communities, powered by Flask and Supabase. It allows users to create customizable event pages and engage through a feature-rich chat system.
 
--   **Event Hosting**: Users can create and host their own events, providing details like name, venue, agenda, and registration links.
--   **Customizable Event Pages**: Hosted events get a dedicated, beautifully designed landing page with parallax scrolling effects.
--   **Live Event Preview**: See a live preview of your event page as you fill out the hosting form.
--   **Community Chat**:
-    -   Create and join public or private communities.
-    -   Real-time messaging with typing indicators.
-    -   Reply to specific messages.
-    -   Create and vote on polls within communities.
-    -   View active members in a community.
--   **User Authentication**: Secure user registration and login managed by Supabase Auth.
--   **User Profiles**: Customizable user profiles with descriptions and avatars.
--   **Supabase Integration**: Uses Supabase for the database (PostgreSQL), authentication, and file storage.
+🔗 **Live Demo:** **https://web-production-aa741.up.railway.app**
 
-## Tech Stack
+---
 
--   **Backend**: Flask, Flask-SocketIO
--   **Frontend**: HTML, Tailwind CSS, JavaScript, jQuery
--   **Database & Backend-as-a-Service**: Supabase (PostgreSQL, Auth, Storage)
--   **Real-time Engine**: `python-socketio` with `eventlet`
--   **Security**: Flask-WTF for CSRF protection, Flask-Limiter for rate limiting.
+## ✨ Features
 
-## Local Setup and Installation
+### 🎪 Event Hosting
+
+- **Create & Manage Events**: Host events with details like title, venue, agenda, schedule, and images.
+- **Custom Event Pages**: Each event gets a dedicated, modern landing page with beautiful parallax scrolling effects.
+- **Live Preview**: See a live preview of your event page as you fill out the hosting form.
+
+### 💬 Real-Time Community Chat
+
+- **Public & Private Groups**: Create and join communities based on your interests.
+- **Live Messaging**: Real-time messaging powered by Flask-SocketIO, complete with typing indicators.
+- **Message Threads**: Reply to specific messages to keep conversations organized.
+- **Interactive Polls**: Create and vote on polls within your community.
+- **Member List**: See who is currently active in a community.
+
+### 👤 User Authentication & Profiles
+
+- **Secure Auth**: User registration and login are securely managed by Supabase Auth.
+- **Custom Profiles**: Personalize your profile with an avatar and description.
+
+### 🛢 Supabase Integration
+
+- **Database**: PostgreSQL for reliable and scalable data storage.
+- **Authentication**: Manages user identity and session security.
+- **File Storage**: Handles uploads for user avatars and event images.
+
+---
+
+## 🛠 Tech Stack
+
+| Category            | Technologies                                         |
+| ------------------- | ---------------------------------------------------- |
+| **Backend**         | Flask, Flask-SocketIO, `python-socketio`, `eventlet` |
+| **Frontend**        | HTML, Tailwind CSS, JavaScript, jQuery               |
+| **Database & BaaS** | Supabase (PostgreSQL, Auth, Storage)                 |
+| **Security**        | Flask-WTF (CSRF Protection), Flask-Limiter           |
+| **Deployment**      | Railway                                              |
+
+---
+
+## ⚙️ Local Setup and Installation
 
 ### Prerequisites
 
--   Python 3.10+
--   `pip` for package management
--   A Supabase account with a project created.
+- Python 3.10+
+- `pip` for package management
+- A Supabase account with a project created.
 
-### Installation
+### Installation Guide
 
-1.  **Clone the repository:**
+1.  **Clone the Repository**
+
     ```bash
     git clone https://github.com/satyam2006-cmd/Fest--studio.git
     cd Fest--studio
     ```
 
-2.  **Create and activate a virtual environment:**
-    ```bash
-    # On Windows
-    python -m venv venv
-    .\venv\Scripts\activate
+2.  **Create and Activate a Virtual Environment**
+    - On **Windows**:
+      ```bash
+      python -m venv venv
+      .\venv\Scripts\activate
+      ```
+    - On **macOS/Linux**:
+      ```bash
+      python3 -m venv venv
+      source venv/bin/activate
+      ```
 
-    # On macOS/Linux
-    python3 -m venv venv
-    source venv/bin/activate
-    ```
+3.  **Install Dependencies**
 
-3.  **Install the required packages:**
     ```bash
     pip install -r requirements.txt
     ```
 
-4.  **Set up your Supabase environment:**
-    -   In your Supabase project dashboard, go to the **SQL Editor**.
-    -   Run the entire `update_schema.sql` script to set up your database tables and functions.
-    -   Go to **Project Settings** > **API**.
-    -   Find your **Project URL** and **anon (public) key**.
+4.  **Configure Supabase**
+    - In your Supabase project dashboard, go to the **SQL Editor**.
+    - Run the entire `update_schema.sql` script to set up your database tables and functions.
+    - Go to **Project Settings** > **API**.
+    - Copy your **Project URL** and **anon (public) key**.
 
-5.  **Create an environment file:**
-    -   Create a file named `.env` in the root of the project.
-    -   Add your Supabase credentials to it like this:
-        ```
-        SUPABASE_URL=YOUR_SUPABASE_PROJECT_URL
-        SUPABASE_KEY=YOUR_SUPABASE_ANON_KEY
-        ```
+5.  **Create an Environment File**
+    - Create a file named `.env` in the root of the project.
+    - Add your Supabase credentials to it:
+      ```
+      SUPABASE_URL=YOUR_SUPABASE_PROJECT_URL
+      SUPABASE_KEY=YOUR_SUPABASE_ANON_KEY
+      ```
 
-6.  **Run the application:**
+6.  **Run the Application**
     ```bash
     python app.py
     ```
+    You can now access the application in your browser at: **http://127.0.0.1:5000**
 
-7.  **Access the application:**
-    Open your web browser and go to `http://127.0.0.1:5000`.
+---
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 .
-├── app.py              # Main Flask application file, routes, and logic
-├── chat_routes.py      # Blueprint for all community chat-related routes and SocketIO events
+├── app.py              # Main Flask application, routes, and logic
+├── chat_routes.py      # Blueprint for chat routes and SocketIO events
 ├── requirements.txt    # Project dependencies
-├── static/             # CSS, JavaScript, images, and user uploads
+├── update_schema.sql   # SQL script for Supabase database schema
+├── static/             # Static files (CSS, JS, images)
 │   ├── css/
 │   ├── images/
-│   └── uploads/
-├── templates/          # HTML templates for the main application
-│   ├── chat/           # HTML templates for the chat blueprint
+│   └── uploads/        # User-uploaded files
+├── templates/          # Jinja2 HTML templates
+│   ├── chat/           # HTML templates for the chat system
 │   └── ...
-└── instance/           # Automatically created folder for the SQLite database
+└── .env.example        # Example environment file
 ```
 
 ---
-# Fest--studio
-# Fest--studio
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome! Feel free to check the issues page or submit a pull request.
+
+## 📄 License
+
+This project is licensed under the MIT License. See the `LICENSE` file for more details.
