@@ -33,7 +33,6 @@ Fest[Studio] is a full-stack web application for planning your events and buildi
 ### 👤 User Authentication & Profiles
 
 - **Secure Auth**: User registration and login are securely managed by Supabase Auth.
-- **Custom Profiles**: Personalize your profile with an avatar and description.
 
 ### 🛢 Supabase Integration
 
