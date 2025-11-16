@@ -252,7 +252,7 @@ def create_app():
             if user and user.id:
                 supabase.table('users').insert({'id': user.id, 'email': user.email, 'username': username}).execute()
 
-            flash('Registered successfully! Please check your email to confirm your account, then log in.', 'success')
+            flash('Registered successfully! Please check your email to confirm your account, just click the link and return to log in.', 'success')
             return redirect(url_for('signin'))
         except Exception as e:
             error_message = str(e)
@@ -264,7 +264,7 @@ def create_app():
                 supabase.auth.resend_confirmation_email(email)
                 flash('This email is already registered. We have sent you another confirmation link.', 'warning')
             else:
-                flash('Registered successfully! Please check your email to confirm your account, then log in.', 'success')
+                flash('Registered successfully! Please check your email to confirm your account, just click the link and return log in.', 'success')
             return redirect(url_for('signin'))
 
     @app.route('/login', methods=['GET', 'POST'])
