@@ -3,26 +3,21 @@ services:
     name: fest-studio
     env: python
     region: oregon
-    plan: free  # Or 'starter' for more resources
+    plan: free
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn --worker-class gthread -w 1 app:app"
-
+    startCommand: "gunicorn --worker-class eventlet -w 1 -b 0.0.0.0:$PORT app:app"
+    healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.5
       - key: SESSION_COOKIE_SECURE
         value: "true"
+      - key: DATABASE_URL
+        sync: false
       - key: SUPABASE_URL
-        fromService:
-          type: external_service
-          name: supabase-fest-studio
-          envVarKey: SUPABASE_URL
+        sync: false
       - key: SUPABASE_KEY
-        fromService:
-          type: external_service
-          name: supabase-fest-studio
-          envVarKey: SUPABASE_KEY
-      # Optional but recommended
+        sync: false
       - key: SECRET_KEY
         sync: false
       - key: WTF_CSRF_SECRET_KEY
