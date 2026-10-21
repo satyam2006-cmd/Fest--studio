@@ -147,7 +147,8 @@ def create_app():
         WTF_CSRF_TIME_LIMIT=3600,
         WTF_CSRF_SECRET_KEY=os.environ.get("WTF_CSRF_SECRET_KEY") or secrets.token_hex(32),
         DATABASE_URL=os.getenv("DATABASE_URL"),
-        SESSION_TYPE='filesystem'  # Add this line
+        SESSION_TYPE='filesystem',  # Add this line
+        TEMPLATES_AUTO_RELOAD=True
     )
 
     # Ensure instance folder exists

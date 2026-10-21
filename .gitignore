@@ -4,9 +4,11 @@ __pycache__/
 
 # Virtual Environment
 venv/
+.venv/
 
 # Instance folder (for sessions or local DB)
 instance/
+uploads/
 
 # Environment variables
 .env
