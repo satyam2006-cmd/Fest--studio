@@ -2,7 +2,7 @@ Flask
 Flask-SocketIO
 Flask-WTF
 Flask-Limiter
-gunicorn
+gunicorn==21.2.0
 supabase
 python-dotenv
 psycopg2-binary
