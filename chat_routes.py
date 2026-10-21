@@ -153,13 +153,15 @@ def chat_login(): # This route handles login POST requests from signin.html
                 # The result is a list, so we take the first item.
                 user_profile = profile_resp.data[0]
 
+        session.permanent = True
         session['user'] = {
-            'id': user_data.id,
+            'id': str(user_data.id),
             'email': user_data.email,
-            'username': user_profile.get('username')
+            'username': user_profile.get('username') if user_profile else None
         }
-        session['user_id'] = user_data.id
+        session['user_id'] = str(user_data.id)
         session['access_token'] = auth_response.session.access_token
+        current_app.logger.info(f"User {user_data.email} logged in successfully.")
         return redirect(next_url)
     except Exception as e:
         error_message = str(e)

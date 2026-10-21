@@ -1,3 +1,6 @@
+import eventlet
+eventlet.monkey_patch()
+
 import os
 import re
 import secrets
@@ -29,6 +32,7 @@ from flask import (
 from flask_wtf.csrf import CSRFProtect, CSRFError, generate_csrf
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
+from werkzeug.middleware.proxy_fix import ProxyFix
 from PIL import Image
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask_socketio import SocketIO
@@ -130,12 +134,13 @@ def create_app():
     # Initialize SocketIO, but defer running to main block
     # This allows us to use the socketio object globally
     
-    # Generate a secure secret key if not provided
-    secret_key = os.environ.get("SECRET_KEY")
-    if not secret_key:
-        secret_key = secrets.token_hex(32)  # Generate a secure random key
-        os.environ["SECRET_KEY"] = secret_key  #
-    
+    # Support reverse proxy headers (e.g. Render HTTPS termination)
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+
+    # Secure secret keys (use env if present, with stable fallback)
+    secret_key = os.environ.get("SECRET_KEY") or "fest-studio-session-secret-key-prod-9921"
+    csrf_secret = os.environ.get("WTF_CSRF_SECRET_KEY") or "fest-studio-csrf-secret-key-prod-9921"
+
     # Load secrets & config from env
     app.config.update(
         SECRET_KEY=secret_key,
@@ -145,9 +150,8 @@ def create_app():
         PERMANENT_SESSION_LIFETIME=timedelta(minutes=int(os.environ.get("SESSION_TTL_MIN", "60"))),
         WTF_CSRF_ENABLED=True,
         WTF_CSRF_TIME_LIMIT=3600,
-        WTF_CSRF_SECRET_KEY=os.environ.get("WTF_CSRF_SECRET_KEY") or secrets.token_hex(32),
+        WTF_CSRF_SECRET_KEY=csrf_secret,
         DATABASE_URL=os.getenv("DATABASE_URL"),
-        SESSION_TYPE='filesystem',  # Add this line
         TEMPLATES_AUTO_RELOAD=True
     )
 
